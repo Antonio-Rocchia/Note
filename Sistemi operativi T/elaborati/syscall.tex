@@ -1,0 +1,230 @@
+% Documentclasses ---------------
+
+%% Article **********************
+% for articles in scientific journals, presentations,
+% short reports, program documentation, invitations, ...
+%% ******************************
+
+%% Report ***********************
+% for longer reports containing several chapters, small books, thesis, ...
+%% ******************************
+
+%% Slides ***********************
+% letter For writing letters.
+%% ******************************
+
+%% Beamer ***********************
+% for writing presentations (see LaTeX/Presentations).
+%% ******************************
+
+%% Letter ***********************
+% for writing letters
+%% ******************************
+\documentclass
+    [10pt,        % Font size(10 default)
+     a4paper,     % Paper size and format
+     %draft,      % Draft mode will improve compilation time but not render figures
+     onecolumn,   % Onecolumn or two columns
+     fleqn,       % fleqn=left align of math formulas
+     %leqno,      % Math formula counter to the left of the formula(right default)
+     oneside,     % When printing, oneside=fronte twoside=fronte-retro
+     notitlepage, % Does not reserve a page for the title, titlepage does
+     openany      % Open chapter anywhere, openright open on right page
+     ]
+    {article}
+
+%% Document metadata -----------
+\title{System call Unix nel linguaggio C}
+\author{Antonio Rocchia}
+%% -----------------------------
+%% Language and encoding -------
+\usepackage[T1]{fontenc}
+\usepackage[italian]{babel}
+\usepackage{parskip}
+\newcommand\hr{
+    \noindent\rule[0.5ex]{\linewidth}{0.5pt}
+}
+%% -----------------------------
+
+%% Header and Footer ------------
+\usepackage{fancyhdr} %Package used for setting headers and footers
+
+% LE: left even
+% RO: right odd
+% CE, CO: center even, center odd
+
+
+  \pagestyle{fancy}
+    \makeatletter
+    \fancyfoot[RE,LO]{\@author}
+    \fancyhead[RE,LO]{\@title}
+    \fancyhead[RO,LE]{\leftmark} % Chapter or section name
+    \makeatother
+
+    \renewcommand{\headrulewidth}{2pt}
+    \renewcommand{\footrulewidth}{1pt}
+%% ------------------------------
+
+%% Add modules here -------------
+%% Code ---------------------------
+%%% Dependencies ******************
+    \usepackage[dvipsnames]{xcolor} % Used by: listings
+%%% ***********************************
+\usepackage{listings} % Code display "https://www.ctan.org/pkg/listings"
+\lstset{
+    backgroundcolor=\color{White},
+    basicstyle=\small\ttfamily,
+    identifierstyle=\color{Black},
+    stringstyle=\color{Green},
+    keywordstyle=\color{NavyBlue},
+    commentstyle=\color{Gray},
+    extendedchars=true,
+    showstringspaces=false,
+    numbers=left,
+    firstnumber=auto,
+    % caption
+    title=\lstname,
+    % frames
+    frame=single
+}
+
+\lstnewenvironment{C++}[1][]
+    {\lstset{language=C++,name=#1}}
+    {}
+
+\lstnewenvironment{C}[1][]
+    {\lstset{language=C,name=#1}}
+    {}
+    
+%%% Snippets """""""""""""""""""""""""
+% snippet [C++] "C++ Code block" bA
+% \begin{C++}[name=]
+% 	
+% \end{C++}
+% endsnippet
+
+% snippet [C] "C Code block" bA
+% \begin{C}[name=]
+% 	
+% \end{C}
+% endsnippet
+
+% snippet code_i "Code Inline" bA
+% \lstinline[language=]!"code"!
+% endsnippet
+
+% snippet import_code "Import code from a file" bA
+% \lstinputlisting[language=,name=]{}
+% endsnippet
+
+%% --------------------------------
+%% ------------------------------
+
+%% Links in and outiside document
+\usepackage{hyperref}
+    \makeatletter
+    \hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,
+    urlcolor=blue,
+    pdftitle={\@title},
+    }
+    \makeatother
+    
+    \urlstyle{same}
+%% ------------------------------
+
+
+\begin{document}
+\maketitle
+\tableofcontents
+\section{Le system call di Unix}
+\hr
+Il kernel di Linux espone un API di funzioni che un utente o un processo può chiamare per richiedere che un servizio venga svolto dal sistema operativo a livello kernel.
+
+Ogni linguaggio di programmazione fa uso di queste system call in tantissimi modi. Ad esempio per aprire e creare file, leggere da un file, inizializzare un processo e così via.
+
+Nei linguaggi di programmazione moderni le system call sono esposte al programmatore tramite una serie di funzioni(wrapper) che ne semplificano l'uso ed impediscono che vengano commesse violazioni dell'API.
+\section{Lista delle system call Unix}
+\hr
+\begin{itemize}
+    \item Controllo dei processi/thread:
+        \begin{itemize}
+            \item Creazione processi
+            \item Terminazione processi
+            \item Sospensione processi
+            \item Attesa terminazione
+            \item Sostituzione di un processo
+        \end{itemize}
+    \item Gestione del file system
+    \item Gestione dei dispositivi
+    \item Comunicazione
+\end{itemize}
+
+\section{Wrapper delle system call nel linguaggio C}
+\subsection{fork()}
+fork - Crea un processo figlio
+\begin{C}[Includere fork]
+    #include <unistd.h>
+
+    int fork();
+\end{C}
+\paragraph{Descrizione:}
+\lstinline[language=C]!fork()! genera un processo figlio duplicando il processo che chiama questa funzione.
+Il nuovo processo è chiamato \textit{figlio}, il processo chiamante è chiamato \textit{padre}
+
+Il processo figlio ed il padre \textit{continuano l'esecuzione in spazi di memoria diversi}. Al momento della fork() \textit{il figlio ottiene una copia dello spazio di memoria del padre}
+Il padre ed il figlio sono identici eccetto per queste differenze:
+\begin{itemize}
+    \item Il figlio ha il suo PID unico e diverso dal padre
+    \item il figlio non eredita allarmi (\textit{alarm()}) dal padre
+    \item Il segnale di terminazione del figlio è sempre \textit{SIGCHLD}
+    \item Il figlio eredita le copie dei descrittori(\textit{file descriptor}) aperti dal padre
+    \item Il filgio eredita una copia dello stream di direttori aperti dal padre (\textit{opendir()})
+\end{itemize}
+\paragraph{Valore di ritorno:}
+In caso di successo, il processo padre riceve il PID del processo figlio appena generato, e il figlio riceve 0. 
+In caso di fallimento, il padre riceve \textit{-1}, non viene generato nessun processo figlio e \textit{errno} viene impostata correttamente.
+\paragraph{Esempi:}
+Di seguito vengono riportati alcuni esempi di codice che mostrano gli utilizzi tipici di fork(). Si cerca dove possibile di spiegare al meglio cio che succede durante l'esecuzione
+
+\begin{C}[Esempio minimale di chiamata a fork()]
+#include <stdio.h>
+#include <unistd.h>
+
+int main(void) {
+   //  Inizializzo e controllo il valore di ritorno di fork()
+   int pid = 0;
+   pid = fork(); 
+\end{C}
+     Il processo figlio ottiene una copia dello spazio di memoria del padre, in questo caso la variabile pid inizializzata a 0.
+ Il processo padre ed il processo figlio proseguono l'esecuzione allo stesso momento (in parallelo), ma con una differenza, \textit{fork restituisce il PID del processo figlio generato al padre e restituisce 0 al figlio}.
+     Questo valore viene assegnato alla variabile pid.
+     Ora possiamo scrivere del codice che permetta al processo di capire se è il padre o il figlio.
+\begin{C}
+   if(pid==0) { // Sono il figlio
+       // Codice del figlio
+       printf("Sono il padre");
+       return 0;
+   } else if(pid > 0) { // Sono il padre
+       // Codice del padre
+       printf("Sono il padre");
+   }
+
+   // N.b. che il figlio non eseguirà questo codice
+   // All'interno del blocco if(pid==0)
+   // viene eseguita la direttiva return
+   return 0;
+}
+\end{C}
+
+
+
+
+
+
+
+
+
+\end{document}

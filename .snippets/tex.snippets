@@ -30,7 +30,8 @@ snippet template "Basic template" b
      %leqno,      % Math formula counter to the left of the formula(right default)
      twoside,     % When printing, oneside=fronte twoside=fronte-retro
      notitlepage, % Does not reserve a page for the title, titlepage does
-     openany      % Open chapter anywhere, openright open on right page]
+     openany      % Open chapter anywhere, openright open on right page
+     ]
     {$3}
 
 %% Document metadata -----------
@@ -82,7 +83,8 @@ snippet template "Basic template" b
 
 
 \begin{document}
-	$0
+\maketitle
+$0
 \end{document}
 endsnippet
 
@@ -114,7 +116,25 @@ $0
 
 endsnippet
 
-snippet 
+snippet [enum] "Ordered list block" bA
+\begin{enum}
+    \item $0
+\end{enum}
+endsnippet
+
+snippet [item] "Unordered list block" bA
+\begin{itemize}
+    \item $0
+\end{itemize}
+endsnippet
+
+snippet litem "item for lists" bA
+\item $0
+endsnippet
+
+snippet \it "Enfasi"
+\textit{$1}$0
+endsnippet
 
 
 snippet module::test_text "Adds blindtext command to generate text" bA
@@ -192,6 +212,7 @@ snippet module::code "Add code enviroments to preamble" bA
 \lstnewenvironment{C}[1][]
 	{\lstset{language=C},#1}
 	{}
+
 %%% Snippets """""""""""""""""""""""""
 % snippet [C++] "C++ Code block" bA
 % \begin{C++}[name=]
