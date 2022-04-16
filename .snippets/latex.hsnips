@@ -1,0 +1,258 @@
+snippet template "Basic latex template" b
+% Documentclasses ---------------
+
+%% Article **********************
+% for articles in scientific journals, presentations,
+% short reports, program documentation, invitations, ...
+%% ******************************
+
+%% Report ***********************
+% for longer reports containing several chapters, small books, thesis, ...
+%% ******************************
+
+%% Slides ***********************
+% letter For writing letters.
+%% ******************************
+
+%% Beamer ***********************
+% for writing presentations (see LaTeX/Presentations).
+%% ******************************
+
+%% Letter ***********************
+% for writing letters
+%% ******************************
+\documentclass
+    [10pt,        % Font size(10 default)
+     a4paper,     % Paper size and format
+     %draft,      % Draft mode will improve compilation time but not render figures
+     onecolumn,   % Onecolumn or two columns
+     fleqn,       % fleqn=left align of math formulas
+     %leqno,      % Math formula counter to the left of the formula(right default)
+     twoside,     % When printing, oneside=fronte twoside=fronte-retro
+     notitlepage, % Does not reserve a page for the title, titlepage does
+     openany      % Open chapter anywhere, openright open on right page
+     ]
+    {$3}
+
+%% Document metadata -----------
+\title{$2}
+\author{$1}
+%% -----------------------------
+%% Language and encoding -------
+\usepackage[T1]{fontenc}
+\usepackage[italian]{babel}
+%% -----------------------------
+
+%% Header and Footer ------------
+\usepackage{fancyhdr} %Package used for setting headers and footers
+
+% LE: left even
+% RO: right odd
+% CE, CO: center even, center odd
+
+
+  \pagestyle{fancy}
+    \makeatletter
+    \fancyfoot[RE,LO]{\@author}
+    \fancyhead[RE,LO]{\@title}
+    \fancyhead[RO,LE]{\leftmark} % Chapter or section name
+    \makeatother
+
+    \renewcommand{\headrulewidth}{2pt}
+    \renewcommand{\footrulewidth}{1pt}
+%% ------------------------------
+
+%% Add modules here -------------
+
+%% ------------------------------
+
+%% Links in and outiside document
+\usepackage{hyperref}
+    \makeatletter
+    \hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,
+    urlcolor=blue,
+    pdftitle={\@title},
+    }
+    \makeatother
+    
+    \urlstyle{same}
+%% ------------------------------
+
+
+\begin{document}
+\maketitle
+$0
+\end{document}
+endsnippet
+
+snippet \toc "Adds table of content" b
+\tableofcontents
+endsnippet
+
+snippet [chap] "Starts a new chapter" bA
+\chapter{$1}
+$0
+
+endsnippet
+
+snippet [sec] "Starts a section" bA
+\section{$1}
+$0
+
+endsnippet
+
+snippet [subsec] "Starts a subsection" bA
+\subsection{$1}
+$0
+
+endsnippet
+
+snippet [par] "Starts a new paragraph" bA
+\paragraph{$1}
+$0
+
+endsnippet
+
+snippet [enum] "Ordered list block" bA
+\begin{enum}
+    \item $0
+\end{enum}
+endsnippet
+
+snippet [item] "Unordered list block" bA
+\begin{itemize}
+    \item $0
+\end{itemize}
+endsnippet
+
+snippet litem "item for lists" bA
+\item $0
+endsnippet
+
+snippet \it "Enfasi"
+\textit{$1}$0
+endsnippet
+
+
+snippet module::test_text "Adds blindtext command to generate text" bA
+%% Test text ----------------------
+\usepackage{blindtext} % Generate test text
+
+%%% Usage *************************
+
+% For few/more paragraphs of normal text:
+% \blindtext
+% \Blindtext
+
+% For a small/large document:
+% \blinddocument
+% \Blinddocument
+
+% In an arbitrary number of repetitions, e.g.
+% \blindtext[5]
+
+% Furthermore,
+% \blindlist{env}[x]
+% creates a list with “x” being the number of items generated. 
+% The environment can be set to itemize, enumerate or description.
+
+% A more direct way to generate lists is by using the commands:
+% \blinditemize
+% \blindenumerate
+% \blinddescription
+% and their extended versions with capital letters are available.
+
+% Similarly, the number of items is defined through the optional argument, e.g.
+\blindenumerate[10]
+
+% If you want math within the text, use
+% \blindmathtrue
+% \blindmathfalse
+% respectively.
+
+% It is also possible to generate text with math including formulas, using
+% \blindmathpaper
+
+%%% *******************************
+
+-----------------------------------
+endsnippet
+
+
+snippet module::code "Add code enviroments to preamble" b
+%% Code ---------------------------
+%%% Dependencies ******************
+	\usepackage[dvipsnames]{xcolor} % Used by: listings
+%%% ***********************************
+\usepackage{listings} % Code display "https://www.ctan.org/pkg/listings"
+\lstset{
+    backgroundcolor=\color{White},
+    basicstyle=\ttfamily,
+    identifierstyle=\color{Black},
+    stringstyle=\color{Green},
+    keywordstyle=\color{NavyBlue},
+    commentstyle=\color{Gray},
+    extendedchars=true,
+    showstringspaces=false,
+    numbers=left,
+    firstnumber=auto,
+    % caption
+    title=\lstname,
+    % frames
+    frame=single
+}
+
+\lstnewenvironment{C++}[1][]
+	{\lstset{language=C++},#1}
+	{}
+
+\lstnewenvironment{C}[1][]
+	{\lstset{language=C},#1}
+	{}
+
+%%% Snippets """""""""""""""""""""""""
+% snippet [C++] "C++ Code block" bA
+% \begin{C++}[name=]
+% 	
+% \end{C++}
+% endsnippet
+
+% snippet [C] "C Code block" bA
+% \begin{C}[name=]
+% 	
+% \end{C}
+% endsnippet
+
+% snippet code_i "Code Inline" bA
+% \lstinline[language=]!"code"!
+% endsnippet
+
+% snippet import_code "Import code from a file" bA
+% \lstinputlisting[language=,name=]{}
+% endsnippet
+
+%% --------------------------------
+endsnippet
+
+snippet [C++] "C++ Code block" bA
+\begin{C++}[name=$1]
+$0
+\end{C++}
+endsnippet
+
+snippet [C] "C Code block" bA
+\begin{C}[name=$1]
+$0
+\end{C}
+endsnippet
+
+snippet code_i "Code Inline" bA
+\lstinline[language=$1]!$0!
+endsnippet
+
+snippet import_code "Import code from a file" bA
+\lstinputlisting[language=$1,name=$0]{$0}
+endsnippet
