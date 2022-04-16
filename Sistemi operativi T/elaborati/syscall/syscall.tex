@@ -39,11 +39,13 @@
 %% -----------------------------
 %% Language and encoding -------
 \usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
 \usepackage[italian]{babel}
 \usepackage{parskip}
 \newcommand\hr{
     \noindent\rule[0.5ex]{\linewidth}{0.5pt}
 }
+\usepackage[htt]{hyphenat}
 %% -----------------------------
 
 %% Header and Footer ------------
@@ -86,6 +88,9 @@
     title=\lstname,
     % frames
     frame=single
+    % breakline
+    breaklines=true,
+    postbreak=\mbox{\textcolor{red}{$\hookrightarrow$}\space},
 }
 
 \lstnewenvironment{C++}[1][]
@@ -93,7 +98,24 @@
     {}
 
 \lstnewenvironment{C}[1][]
-    {\lstset{language=C,name=#1}}
+    {\lstset{language=C,name=#1,
+            backgroundcolor=\color{White},
+    basicstyle=\small\ttfamily,
+    identifierstyle=\color{Black},
+    stringstyle=\color{Green},
+    keywordstyle=\color{NavyBlue},
+    commentstyle=\color{Gray},
+    extendedchars=true,
+    showstringspaces=false,
+    numbers=left,
+    firstnumber=auto,
+    % caption
+    title=\lstname,
+    % frames
+    frame=single
+    % breakline
+    breaklines=true,
+postbreak=\mbox{\textcolor{red}{$\hookrightarrow$}\space},}}
     {}
     
 %%% Snippets """""""""""""""""""""""""
@@ -211,20 +233,33 @@ int main(void) {
        // Codice del padre
        printf("Sono il padre");
    }
-
-   // N.b. che il figlio non eseguirà questo codice
-   // All'interno del blocco if(pid==0)
-   // viene eseguita la direttiva return
    return 0;
 }
 \end{C}
+Il processo figlio esegue lo stesso codice del processo padre. Pertanto nella maggior parte dei casi è necessario terminare l'esecuzione del figlio prima di uscire dal blocco \textit{if(pid==0)}
+
+%paragraph{Todo: aggiungere più esempi}
 
 
+\subsection{getpid(),getppid()}
+getpid, getppid - restituisce l'identificatore del processo(PID)
+\begin{C}[Includere getpid()]
+#include <unistd.h>
 
+int getpid();
+int getppid();
+\end{C}
+\paragraph{Descrizione:}
+\textit{getpid()} restituisce al processo che chiama la funzione il sui identificatore di processo \textit{(PID)}.
 
+\textit{getppid()} restituisce al processo che chiama la funzione l'identificativo di processo \textit{(PID)} del suo processo padre.
+\paragraph{Controllo degli errori}
+Questa system call non fallisce mai. Non è necessario alcun controllo.
+\paragraph{Esempi:}
+Di seguito alcuni esempi di codice che mostrano l'utilizo di getpid() e getppid().
 
+\lstinputlisting[language=C,name=getpid() in azione]{esempi/getpid_base.c}
 
-
-
+Scrivo altro
 
 \end{document}
