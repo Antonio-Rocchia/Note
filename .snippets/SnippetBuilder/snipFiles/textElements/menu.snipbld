@@ -1,0 +1,3 @@
+snippet \toc "Adds table of content" b
+\tableofcontents
+endsnippet

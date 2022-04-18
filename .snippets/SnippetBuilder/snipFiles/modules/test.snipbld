@@ -1,0 +1,43 @@
+snippet module::test_text "Adds blindtext command to generate text" bA
+%% Test text ----------------------
+\usepackage{blindtext} % Generate test text
+
+%%% Usage *************************
+
+% For few/more paragraphs of normal text:
+% \blindtext
+% \Blindtext
+
+% For a small/large document:
+% \blinddocument
+% \Blinddocument
+
+% In an arbitrary number of repetitions, e.g.
+% \blindtext[5]
+
+% Furthermore,
+% \blindlist{env}[x]
+% creates a list with “x” being the number of items generated. 
+% The environment can be set to itemize, enumerate or description.
+
+% A more direct way to generate lists is by using the commands:
+% \blinditemize
+% \blindenumerate
+% \blinddescription
+% and their extended versions with capital letters are available.
+
+% Similarly, the number of items is defined through the optional argument, e.g.
+\blindenumerate[10]
+
+% If you want math within the text, use
+% \blindmathtrue
+% \blindmathfalse
+% respectively.
+
+% It is also possible to generate text with math including formulas, using
+% \blindmathpaper
+
+%%% *******************************
+
+-----------------------------------
+endsnippet

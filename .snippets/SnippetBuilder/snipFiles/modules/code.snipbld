@@ -1,0 +1,74 @@
+snippet module::code "Add code enviroments to preamble" b
+%% Code ---------------------------
+%%% Dependencies ******************
+	\usepackage[dvipsnames]{xcolor} % Used by: listings
+%%% ***********************************
+\usepackage{listings} % Code display "https://www.ctan.org/pkg/listings"
+\lstset{
+    backgroundcolor=\color{White},
+    basicstyle=\ttfamily,
+    identifierstyle=\color{Black},
+    stringstyle=\color{Green},
+    keywordstyle=\color{NavyBlue},
+    commentstyle=\color{Gray},
+    extendedchars=true,
+    showstringspaces=false,
+    % caption
+    title=\lstname,
+    % frames
+    frame=lines,
+    breaklines=true,
+    postbreak=\mbox{\textcolor{red}{$\hookrightarrow$}\space},
+}
+
+\lstnewenvironment{C++}[1][]
+	{\lstset{language=C++},#1}
+	{}
+
+\lstnewenvironment{C}[1][]
+	{\lstset{language=C},#1}
+	{}
+
+%%% Snippets """""""""""""""""""""""""
+% snippet [C++] "C++ Code block" bA
+% \begin{C++}[name=]
+% 	
+% \end{C++}
+% endsnippet
+
+% snippet [C] "C Code block" bA
+% \begin{C}[name=]
+% 	
+% \end{C}
+% endsnippet
+
+% snippet code_i "Code Inline" bA
+% \lstinline[language=]!"code"!
+% endsnippet
+
+% snippet import_code "Import code from a file" bA
+% \lstinputlisting[language=,name=]{}
+% endsnippet
+
+%% --------------------------------
+endsnippet
+
+snippet [C++] "C++ Code block" bA
+\begin{C++}[name=$1]
+$0
+\end{C++}
+endsnippet
+
+snippet [C] "C Code block" bA
+\begin{C}[name=$1]
+$0
+\end{C}
+endsnippet
+
+snippet code_i "Code Inline" bA
+\lstinline[language=$1]!$0!
+endsnippet
+
+snippet import_code "Import code from a file" bA
+\lstinputlisting[language=$1,name=$0]{$0}
+endsnippet
