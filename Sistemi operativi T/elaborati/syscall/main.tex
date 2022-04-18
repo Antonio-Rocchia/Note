@@ -123,6 +123,9 @@ pdfauthor={\@author}
 % endsnippet
 
 %% --------------------------------
+
+\usepackage{subfiles}
+
 %endregion modules
 
 %region Body
@@ -156,86 +159,7 @@ Nei linguaggi di programmazione moderni le system call sono esposte al programma
     \item Comunicazione
 \end{itemize}
 
-\section{Wrapper delle system call nel linguaggio C}
-\subsection{fork()}
-fork - Crea un processo figlio
-\begin{C}[Includere fork]
-    #include <unistd.h>
-
-    int fork();
-\end{C}
-\paragraph{Descrizione:}
-\lstinline[language=C]!fork()! genera un processo figlio duplicando il processo che chiama questa funzione.
-Il nuovo processo è chiamato \textit{figlio}, il processo chiamante è chiamato \textit{padre}
-
-Il processo figlio ed il padre \textit{continuano l'esecuzione in spazi di memoria diversi}. Al momento della fork() \textit{il figlio ottiene una copia dello spazio di memoria del padre}
-Il padre ed il figlio sono identici eccetto per queste differenze:
-\begin{itemize}
-    \item Il figlio ha il suo PID unico e diverso dal padre
-    \item il figlio non eredita allarmi (\textit{alarm()}) dal padre
-    \item Il segnale di terminazione del figlio è sempre \textit{SIGCHLD}
-    \item Il figlio eredita le copie dei descrittori(\textit{file descriptor}) aperti dal padre
-    \item Il filgio eredita una copia dello stream di direttori aperti dal padre (\textit{opendir()})
-\end{itemize}
-\paragraph{Valore di ritorno:}
-In caso di successo, il processo padre riceve il PID del processo figlio appena generato, e il figlio riceve 0. 
-In caso di fallimento, il padre riceve \textit{-1}, non viene generato nessun processo figlio e \textit{errno} viene impostata correttamente.
-\paragraph{Esempi:}
-Di seguito vengono riportati alcuni esempi di codice che mostrano gli utilizzi tipici di fork(). Si cerca dove possibile di spiegare al meglio cio che succede durante l'esecuzione
-
-\begin{C}[Esempio minimale di chiamata a fork()]
-#include <stdio.h>
-#include <unistd.h>
-
-int main(void) {
-   //  Inizializzo e controllo il valore di ritorno di fork()
-   int pid = 0;
-   pid = fork(); 
-\end{C}
-     Il processo figlio ottiene una copia dello spazio di memoria del padre, in questo caso la variabile pid inizializzata a 0.
- Il processo padre ed il processo figlio proseguono l'esecuzione allo stesso momento (in parallelo), ma con una differenza, \textit{fork restituisce il PID del processo figlio generato al padre e restituisce 0 al figlio}.
-     Questo valore viene assegnato alla variabile pid.
-     Ora possiamo scrivere del codice che permetta al processo di capire se è il padre o il figlio.
-\begin{C}
-   if(pid==0) { // Sono il figlio
-       // Codice del figlio
-       printf("Sono il padre");
-       return 0;
-   } else if(pid > 0) { // Sono il padre
-       // Codice del padre
-       printf("Sono il padre");
-   }
-   return 0;
-}
-\end{C}
-Il processo figlio esegue lo stesso codice del processo padre. Pertanto nella maggior parte dei casi è necessario terminare l'esecuzione del figlio prima di uscire dal blocco \textit{if(pid==0)}
-
-%paragraph{Todo: aggiungere più esempi}
-
-
-\subsection{getpid(),getppid()}
-getpid, getppid - restituisce l'identificatore del processo(PID)
-\begin{C}[Includere getpid()]
-#include <unistd.h>
-
-int getpid();
-int getppid();
-\end{C}
-\paragraph{Descrizione:}
-\textit{getpid()} restituisce al processo che chiama la funzione il sui identificatore di processo \textit{(PID)}.
-
-\textit{getppid()} restituisce al processo che chiama la funzione l'identificativo di processo \textit{(PID)} del suo processo padre.
-\paragraph{Controllo degli errori}
-Questa system call non fallisce mai. Non è necessario alcun controllo.
-\paragraph{Esempi:}
-Di seguito alcuni esempi di codice che mostrano l'utilizo di getpid() e getppid().
-
-\lstinputlisting[language=C,name=getpid() in azione]{esempi/getpid_base.c}
-
-\subsection{exit()}
-exit - Causa la terminazione \textit{volontaria} di un processo.
-
-Un processo può terminare involontariamente, se si tentano azioni illegali o se il processo viene interrotto tramite \textit{segnale} (\textit{kill()}), o volontariamente, se viene eseguita l'ultima istruzione o si esegue la funzione exit();
+\subfile{sections/wrapper_syscall_c.tex}
 
 
 

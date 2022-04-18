@@ -75,9 +75,7 @@ pdfauthor={\@author}
 
 %endregion modules
 
-%region Body
 \begin{document}
-
 %region Title and TOC
 \microtypesetup{protrusion=false} % disables protrusion locally in the document
 \maketitle          
@@ -88,7 +86,13 @@ pdfauthor={\@author}
 $0
 
 \end{document}
-%endregion Body
+endsnippet
+snippet subfile_template "Template for a subfile" bA
+\documentclass[../main.tex]{subfiles}
+
+\begin{document}
+$0
+\end{document}
 endsnippet
 snippet [chap "Starts a new chapter" bA
 \chapter{$1}
@@ -135,49 +139,8 @@ endsnippet
 snippet \it "Enfasi"
 \textit{$1}$0
 endsnippet
-
-snippet module::test_text "Adds blindtext command to generate text" bA
-%% Test text ----------------------
-\usepackage{blindtext} % Generate test text
-
-%%% Usage *************************
-
-% For few/more paragraphs of normal text:
-% \blindtext
-% \Blindtext
-
-% For a small/large document:
-% \blinddocument
-% \Blinddocument
-
-% In an arbitrary number of repetitions, e.g.
-% \blindtext[5]
-
-% Furthermore,
-% \blindlist{env}[x]
-% creates a list with “x” being the number of items generated. 
-% The environment can be set to itemize, enumerate or description.
-
-% A more direct way to generate lists is by using the commands:
-% \blinditemize
-% \blindenumerate
-% \blinddescription
-% and their extended versions with capital letters are available.
-
-% Similarly, the number of items is defined through the optional argument, e.g.
-\blindenumerate[10]
-
-% If you want math within the text, use
-% \blindmathtrue
-% \blindmathfalse
-% respectively.
-
-% It is also possible to generate text with math including formulas, using
-% \blindmathpaper
-
-%%% *******************************
-
------------------------------------
+snippet module::subpackage:main "Add support for subpackage module to the main document" bA
+\usepackage[subpreambles=true]{subfiles}
 endsnippet
 
 snippet module::code "Add code enviroments to preamble" b
@@ -195,12 +158,12 @@ snippet module::code "Add code enviroments to preamble" b
     commentstyle=\color{Gray},
     extendedchars=true,
     showstringspaces=false,
-    numbers=left,
-    firstnumber=auto,
     % caption
     title=\lstname,
     % frames
-    frame=single
+    frame=lines,
+    breaklines=true,
+    postbreak=\mbox{\textcolor{red}{$\hookrightarrow$}\space},
 }
 
 \lstnewenvironment{C++}[1][]
@@ -253,4 +216,47 @@ endsnippet
 
 snippet import_code "Import code from a file" bA
 \lstinputlisting[language=$1,name=$0]{$0}
+endsnippet
+snippet module::test_text "Adds blindtext command to generate text" bA
+%% Test text ----------------------
+\usepackage{blindtext} % Generate test text
+
+%%% Usage *************************
+
+% For few/more paragraphs of normal text:
+% \blindtext
+% \Blindtext
+
+% For a small/large document:
+% \blinddocument
+% \Blinddocument
+
+% In an arbitrary number of repetitions, e.g.
+% \blindtext[5]
+
+% Furthermore,
+% \blindlist{env}[x]
+% creates a list with “x” being the number of items generated. 
+% The environment can be set to itemize, enumerate or description.
+
+% A more direct way to generate lists is by using the commands:
+% \blinditemize
+% \blindenumerate
+% \blinddescription
+% and their extended versions with capital letters are available.
+
+% Similarly, the number of items is defined through the optional argument, e.g.
+\blindenumerate[10]
+
+% If you want math within the text, use
+% \blindmathtrue
+% \blindmathfalse
+% respectively.
+
+% It is also possible to generate text with math including formulas, using
+% \blindmathpaper
+
+%%% *******************************
+
+-----------------------------------
 endsnippet
