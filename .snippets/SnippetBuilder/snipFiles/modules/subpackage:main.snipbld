@@ -1,0 +1,4 @@
+snippet module::subpackage:main "Add support for subpackage module to the main document" bA
+\usepackage[subpreambles=true]{subfiles}
+\usepackage{import}
+endsnippet

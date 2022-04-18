@@ -75,9 +75,7 @@ pdfauthor={\@author}
 
 %endregion modules
 
-%region Body
 \begin{document}
-
 %region Title and TOC
 \microtypesetup{protrusion=false} % disables protrusion locally in the document
 \maketitle          
@@ -88,5 +86,4 @@ pdfauthor={\@author}
 $0
 
 \end{document}
-%endregion Body
 endsnippet
