@@ -1,73 +1,76 @@
-% Documentclasses ---------------
+\RequirePackage[l2tabu, orthodox]{nag}
 
-%% Article **********************
-% for articles in scientific journals, presentations,
-% short reports, program documentation, invitations, ...
-%% ******************************
-
-%% Report ***********************
-% for longer reports containing several chapters, small books, thesis, ...
-%% ******************************
-
-%% Slides ***********************
-% letter For writing letters.
-%% ******************************
-
-%% Beamer ***********************
-% for writing presentations (see LaTeX/Presentations).
-%% ******************************
-
-%% Letter ***********************
-% for writing letters
-%% ******************************
 \documentclass
-    [10pt,        % Font size(10 default)
-     a4paper,     % Paper size and format
-     %draft,      % Draft mode will improve compilation time but not render figures
-     onecolumn,   % Onecolumn or two columns
-     fleqn,       % fleqn=left align of math formulas
-     %leqno,      % Math formula counter to the left of the formula(right default)
-     oneside,     % When printing, oneside=fronte twoside=fronte-retro
-     notitlepage, % Does not reserve a page for the title, titlepage does
-     openany      % Open chapter anywhere, openright open on right page
-     ]
-    {article}
+[10pt,        % Font size(10 default)
+ a4paper,     % Paper size and format
+ %draft,      % Draft mode will improve compilation time but not render figures
+ onecolumn,   % Onecolumn or two columns
+ fleqn,       % fleqn=left align of math formulas
+ %leqno,      % Math formula counter to the left of the formula(right default)
+ twoside,     % When printing, oneside=fronte twoside=fronte-retro
+ notitlepage, % Does not reserve a page for the title, titlepage does
+ openany      % Open chapter anywhere, openright open on right page
+]{article}    % article, book, report, letter, beamer
 
-%% Document metadata -----------
-\title{System call Unix nel linguaggio C}
+%region Preamble
+
+%region Metadata
+\title{Le system call nel sistema Unix}
 \author{Antonio Rocchia}
-%% -----------------------------
-%% Language and encoding -------
-\usepackage[T1]{fontenc}
-\usepackage[utf8]{inputenc}
-\usepackage[italian]{babel}
-\usepackage{parskip}
-\newcommand\hr{
-    \noindent\rule[0.5ex]{\linewidth}{0.5pt}
+%endregion Metadata
+
+%region Language and encoding settings
+\usepackage[utf8]{inputenc}                 % Input encoding for characters written in the .tex document
+\usepackage[T1]{fontenc}                    % Output encoding for characters written in the .pdf document
+\usepackage[italian, english]{babel}        % Languages used in this file, switch with \selectlanguage{language}, default is italian
+%endregion Language and encoding settings
+
+%region Page layout settings
+%region Page dimension, margin, header and footer dimensions
+\usepackage{geometry}
+\geometry{
+paper=a4paper,              % Type of paper used
+hmargin=2cm,                % Shorthand for left and right margin
+bindingoffset=1cm,          % Offset from page binding to the start of the inner margin
+top=1cm,                    % Top margin
+bottom=0.8cm,               % Bottom margin
+includeheadfoot=true,       % Include header and footer in the body size
+headsep=1cm,                % Distance from header and main text
+headheight=12pt,            % Height of the header
+footskip=2cm,               % Distance from the bottom of the foot the end of body
 }
-\usepackage[htt]{hyphenat}
-%% -----------------------------
+%endregion Page dimension, margin, header and footer dimensions
 
-%% Header and Footer ------------
-\usepackage{fancyhdr} %Package used for setting headers and footers
+%region Header and footer content
+\usepackage{fancyhdr}
+\pagestyle{plain}
+%endregion Header and footer content
 
-% LE: left even
-% RO: right odd
-% CE, CO: center even, center odd
+%region Microtype
+\usepackage[final,babel=true]{microtype}
+%endregion Microtype
 
+%endregion Page layout settings
 
-  \pagestyle{fancy}
-    \makeatletter
-    \fancyfoot[RE,LO]{\@author}
-    \fancyhead[RE,LO]{\@title}
-    \fancyhead[RO,LE]{\leftmark} % Chapter or section name
-    \makeatother
+%region Hyperlinks
+\usepackage{hyperref}
+\makeatletter
+\hypersetup{
+colorlinks=true,
+linkcolor=blue,
+filecolor=magenta,
+urlcolor=blue,
+pdftitle={\@title},
+pdfauthor={\@author}
+}
+\makeatother
+    
+\urlstyle{same}
+%endregion Hyperlinks
 
-    \renewcommand{\headrulewidth}{2pt}
-    \renewcommand{\footrulewidth}{1pt}
-%% ------------------------------
+%endregion Preamble
 
-%% Add modules here -------------
+%region modules
 %% Code ---------------------------
 %%% Dependencies ******************
     \usepackage[dvipsnames]{xcolor} % Used by: listings
@@ -75,49 +78,29 @@
 \usepackage{listings} % Code display "https://www.ctan.org/pkg/listings"
 \lstset{
     backgroundcolor=\color{White},
-    basicstyle=\small\ttfamily,
+    basicstyle=\ttfamily,
     identifierstyle=\color{Black},
     stringstyle=\color{Green},
     keywordstyle=\color{NavyBlue},
     commentstyle=\color{Gray},
     extendedchars=true,
     showstringspaces=false,
-    numbers=left,
-    firstnumber=auto,
     % caption
     title=\lstname,
     % frames
-    frame=single
-    % breakline
+    frame=lines,
     breaklines=true,
     postbreak=\mbox{\textcolor{red}{$\hookrightarrow$}\space},
 }
 
 \lstnewenvironment{C++}[1][]
-    {\lstset{language=C++,name=#1}}
+    {\lstset{language=C++},#1}
     {}
 
 \lstnewenvironment{C}[1][]
-    {\lstset{language=C,name=#1,
-            backgroundcolor=\color{White},
-    basicstyle=\small\ttfamily,
-    identifierstyle=\color{Black},
-    stringstyle=\color{Green},
-    keywordstyle=\color{NavyBlue},
-    commentstyle=\color{Gray},
-    extendedchars=true,
-    showstringspaces=false,
-    numbers=left,
-    firstnumber=auto,
-    % caption
-    title=\lstname,
-    % frames
-    frame=single
-    % breakline
-    breaklines=true,
-postbreak=\mbox{\textcolor{red}{$\hookrightarrow$}\space},}}
+    {\lstset{language=C},#1}
     {}
-    
+
 %%% Snippets """""""""""""""""""""""""
 % snippet [C++] "C++ Code block" bA
 % \begin{C++}[name=]
@@ -140,36 +123,25 @@ postbreak=\mbox{\textcolor{red}{$\hookrightarrow$}\space},}}
 % endsnippet
 
 %% --------------------------------
-%% ------------------------------
+%endregion modules
 
-%% Links in and outiside document
-\usepackage{hyperref}
-    \makeatletter
-    \hypersetup{
-    colorlinks=true,
-    linkcolor=blue,
-    filecolor=magenta,
-    urlcolor=blue,
-    pdftitle={\@title},
-    }
-    \makeatother
-    
-    \urlstyle{same}
-%% ------------------------------
-
-
+%region Body
 \begin{document}
-\maketitle
-\tableofcontents
+
+%region Title and TOC
+\microtypesetup{protrusion=false} % disables protrusion locally in the document
+\maketitle          
+\tableofcontents % prints Table of Contents
+\microtypesetup{protrusion=true} % enables protrusion
+%endregion Title and TOC
+
 \section{Le system call di Unix}
-\hr
 Il kernel di Linux espone un API di funzioni che un utente o un processo può chiamare per richiedere che un servizio venga svolto dal sistema operativo a livello kernel.
 
 Ogni linguaggio di programmazione fa uso di queste system call in tantissimi modi. Ad esempio per aprire e creare file, leggere da un file, inizializzare un processo e così via.
 
 Nei linguaggi di programmazione moderni le system call sono esposte al programmatore tramite una serie di funzioni(wrapper) che ne semplificano l'uso ed impediscono che vengano commesse violazioni dell'API.
 \section{Lista delle system call Unix}
-\hr
 \begin{itemize}
     \item Controllo dei processi/thread:
         \begin{itemize}
@@ -260,6 +232,13 @@ Di seguito alcuni esempi di codice che mostrano l'utilizo di getpid() e getppid(
 
 \lstinputlisting[language=C,name=getpid() in azione]{esempi/getpid_base.c}
 
-Scrivo altro
+\subsection{exit()}
+exit - Causa la terminazione \textit{volontaria} di un processo.
+
+Un processo può terminare involontariamente, se si tentano azioni illegali o se il processo viene interrotto tramite \textit{segnale} (\textit{kill()}), o volontariamente, se viene eseguita l'ultima istruzione o si esegue la funzione exit();
+
+
+
 
 \end{document}
+%endregion Body
