@@ -51,6 +51,10 @@ footskip=2cm,               % Distance from the bottom of the foot the end of bo
 \usepackage[final,babel=true]{microtype}
 %endregion Microtype
 
+%region Parskip
+/usepackage{parskip}
+%endregion Parskip
+
 %endregion Page layout settings
 
 %region Hyperlinks
