@@ -1,8 +1,6 @@
 snippet module::code "Add code enviroments to preamble" b
-%% Code ---------------------------
-%%% Dependencies ******************
-	\usepackage[dvipsnames]{xcolor} % Used by: listings
-%%% ***********************************
+%region Code module
+\usepackage[dvipsnames]{xcolor} % Used by: listings
 \usepackage{listings} % Code display "https://www.ctan.org/pkg/listings"
 \lstset{
     backgroundcolor=\color{White},
@@ -29,7 +27,7 @@ snippet module::code "Add code enviroments to preamble" b
 	{\lstset{language=C},#1}
 	{}
 
-%%% Snippets """""""""""""""""""""""""
+%region Snippets 
 % snippet [C++] "C++ Code block" bA
 % \begin{C++}[name=]
 % 	
@@ -49,8 +47,7 @@ snippet module::code "Add code enviroments to preamble" b
 % snippet import_code "Import code from a file" bA
 % \lstinputlisting[language=,name=]{}
 % endsnippet
-
-%% --------------------------------
+%endregion Snippets
 endsnippet
 
 snippet [C++] "C++ Code block" bA
@@ -70,5 +67,6 @@ snippet code_i "Code Inline" bA
 endsnippet
 
 snippet import_code "Import code from a file" bA
-\lstinputlisting[language=$1,name=$0]{$0}
+\lstinputlisting[language=$1,name=$2,firstline=$3,lastline=$0]{$4}
 endsnippet
+%endregion Code module
