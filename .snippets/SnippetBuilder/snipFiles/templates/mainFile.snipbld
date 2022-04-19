@@ -1,4 +1,4 @@
-snippet template "main file latex template" b
+snippet template::main "main file latex template" b
 \RequirePackage[l2tabu, orthodox]{nag}
 
 \documentclass

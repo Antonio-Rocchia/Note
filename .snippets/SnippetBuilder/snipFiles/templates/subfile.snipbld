@@ -1,4 +1,4 @@
-snippet subfile_template "Template for a subfile" bA
+snippet template::subfile "Template for a subfile" bA
 \documentclass[../main.tex]{subfiles}
 
 \begin{document}
