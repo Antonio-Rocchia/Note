@@ -257,6 +257,12 @@ Questa system call non ha nessun valore di ritorno.
 \paragraph{Esempi}
 Todo esempi
 
+%\subsection{wait()}
+
+%\subsection{exec()}
+
+
+
 \subsection{pipe()}
 pipe - Crea una pipe.
 \begin{C}[name=pipe()]
@@ -344,6 +350,26 @@ I segnali SIGKILL e SIGSTOP non possono essere ignorati e non possono essere ges
 
 \paragraph{Valore di ritorno}
 Il valore di ritorno in caso di errore è SIG\_ERR e errno viene correttamente impostato.
+
+\paragraph{Persistenza dell'handler}
+Alla fine dell'esecuzione di un handler definito dall'utente il sistema si occupa di reinstallarlo automaticamente.
+
+Se durante l'esecuizone di un handler, arriva un secondo segnale uguale a quello che ha causato la sua esecuzione, il segnale viene accodato e gestito una volta terminato il primo handler.
+
+Segnali che arrivano mentre c'è un segnale uguale accodato vengono accorpati, come se fosse un solo segnale. Quindi un solo segnale verrà consegnato al processo.
+
+
+\paragraph{Gestire un segnale durante una system call}
+Cosa succede se arriva un segnale mentre c'è una system call in esecuzione.
+
+Le system call possono essere classificate come slow o non slow. \textit{Le system call slow possono essere interrotte da un segnale}, in questo caso la system call fallisce.
+
+
+
+
+
+
+
 
 \subsection{kill() e raise()}
 kill - Invia un segnale ad un processo.
