@@ -9,7 +9,7 @@
  %leqno,      % Math formula counter to the left of the formula(right default)
  oneside,     % When printing, oneside=fronte twoside=fronte-retro
  notitlepage, % Does not reserve a page for the title, titlepage does
- openany      % Open chapter anywhere, openright open on right page
+ %openany      % Open chapter anywhere, openright open on right page
 ]{article}    % article, book, report, letter, beamer
 
 %region Preamble
@@ -49,6 +49,10 @@ footskip=2cm,               % Distance from the bottom of the foot the end of bo
 %region Microtype
 \usepackage[final,babel=true]{microtype}
 %endregion Microtype
+
+%region Parskip
+\usepackage{parskip}
+%endregion Parskip
 
 %endregion Page layout settings
 
@@ -178,7 +182,7 @@ Il padre ed il figlio sono identici eccetto per queste differenze:
     \item il figlio non eredita allarmi (\textit{alarm()}) dal padre
     \item Il segnale di terminazione del figlio è sempre \textit{SIGCHLD}
     \item Il figlio eredita le copie dei descrittori(\textit{file descriptor}) aperti dal padre
-    \item Il filgio eredita una copia dello stream di direttori aperti dal padre (\textit{opendir()})
+    \item Il figlio eredita una copia dello stream di direttori aperti dal padre (\textit{opendir()})
 \end{itemize}
 \paragraph{Valore di ritorno:}
 In caso di successo, il processo padre riceve il PID del processo figlio appena generato, e il figlio riceve 0. 
@@ -196,7 +200,6 @@ Il processo figlio esegue lo stesso codice del processo padre. Pertanto nella ma
 \lstinputlisting[name=Output fork_base.c]{esempi/fork/fork_base.output}
 %paragraph{Todo: aggiungere più esempi}
 
-
 \subsection{getpid(),getppid()}
 getpid, getppid - restituisce l'identificatore del processo(PID)
 \begin{C}[Includere getpid()]
@@ -211,6 +214,11 @@ int getppid();
 \textit{getppid()} restituisce al processo che chiama la funzione l'identificativo di processo \textit{(PID)} del suo processo padre.
 \paragraph{Controllo degli errori}
 Questa system call non fallisce mai. Non è necessario alcun controllo.
+\paragraph{Valore di ritorno}
+\begin{itemize}
+    \item getpid(): Restituisce il pid del processo che la chiama
+    \item getppid(): Restituisce il pid del padre del processo che la chiama.
+\end{itemize}
 \paragraph{Esempi:}
 Di seguito alcuni esempi di codice che mostrano l'utilizo di getpid() e getppid().
 
@@ -221,7 +229,82 @@ Di seguito alcuni esempi di codice che mostrano l'utilizo di getpid() e getppid(
 \subsection{exit()}
 exit - Causa la terminazione \textit{volontaria} di un processo.
 
-Un processo può terminare involontariamente, se si tentano azioni illegali o se il processo viene interrotto tramite \textit{segnale} (\textit{kill()}), o volontariamente, se viene eseguita l'ultima istruzione o si esegue la funzione exit();
+Un processo può terminare involontariamente, se si tentano azioni illegali o se il processo viene interrotto tramite \textit{segnale} (\textit{kill()}), o volontariamente, se viene eseguita l'ultima istruzione o si esegue la funzione exit()
+\begin{C}
+#include <stdlib.h>
+    
+void exit(int status);
+\end{C}
+    
+\paragraph{exit o return?}
+Se una procedura raggiunge un return, restuisce un valore alla procedura che l'ha invocata, il processo termina solo se il main effettua un return. exit() invece termina il processo in esecuzione, anche se non viene chiamato dal main.
+
+\paragraph{Descrizione}
+La funzione exit() causa la normale terminazione di un processo.
+\begin{itemize}
+    \item Il byte meno significativo di \textit{status} è restituito al processo padre.
+    \item Tutte le stream di stdio \textit{(stdin,stdout,stderr)} vengono chiuse.
+    \item La libreria standard di C \textit{stdlib.h} specifica due costanti \lstinline!(EXIT_SUCCESS, EXIT_FAILURE)! che possono essere usate per specificare l'esito della terminazione.
+    \item Se un processo padre termina prima della terminazione di un figlio. Il processo figlio viene "\textit{adottato}" dal processo init (pid==1), che ne rileva automaticamente lo stato di terminazione.
+\end{itemize}
+
+\paragraph{Controllo degli errori}
+Questa system call non fallisce main. Non è necessario alcun controllo.
+
+\paragraph{Valore di ritorno}
+Questa system call non ha nessun valore di ritorno.
+
+\paragraph{Esempi}
+Todo esempi
+
+\subsection{pipe()}
+pipe - Crea una pipe.
+\begin{C}[name=pipe()]
+#include <unistd.h>
+
+int pipe(int pipefd[2]);
+\end{C}
+
+\paragraph{Descrizione:}
+pipe() crea una pipe, un \textit{canale di comunicazione tra processi unidirezionale} per la trasmissione dei dati. 
+
+L'array \textit{int pipefd[2]} è usato per specificare due \textit{descrittori file (file descriptors)} che rappresentano gli estremi della pipe:
+\begin{itemize}
+    \item pipefd[0] rappresenta il lato di lettura della pipe.
+    \item pipefd[1] rappresenta il lato di scrittura della pipe.
+\end{itemize}
+
+Quando tutti i descrittori di file che si riferiscono al lato scrittura della pipe vengono chiusi, viene scritto \textit{EOF}(end of file) sulla pipe. Il lato lettura potrà leggerlo tramite \textit{read} e restitirà 0.
+
+\lstinputlisting[language=C,name=Chiusura lato scrittura,firstline=0]{esempi/pipe/close_write.c}
+
+Quando vengono chiusi tutti i descrittori di file che si riferiscono al lato lettura, ogni write verso la pipe causera un \textit{SIGPIPE} verso il processo che prova a leggere. Questa situazione potrà quindi essere gestita come ogni altro segnale.
+
+\lstinputlisting[language=C,name=Chiusura lato lettura,firstline=0]{esempi/pipe/close_read.c}
+
+La pipe non ha una dimensione. Il canale di comunicazione della pipe è una \textit{byte stream}, quindi non esiste il concetto di limite del file. Il kernel si occupa di gestire la pipe.
+\begin{itemize}
+    \item Se la pipe è piena, write sarà sospensiva.
+    \item Se la pipe è vuota o non ha la quantità di byte richiesti da una read, read sarà sospensiva.
+\end{itemize}
+
+La capacità effettiva della pipe dipende dall'implementazione. In ogni caso è preferibile che il programma non sia progettato facendo affidamento ad una particolare capacità: Un applicazione dovrebbe essere progettata in modo che il processo che legge consumi i dati appena sono disponibili, cosi che il processo di scrittura non rimanga bloccato.
+
+Un applicazione che usa pipe() e fork() dovrebbe usare close() per chiudere file descriptor duplicati di cui non ha bisogno. Se il processo figlio deve solo scrivere dati, chiudera il lato lettura della pipe. close(pipefd[0]);
+
+\lstinputlisting[language=C,name=Chiudere i file descriptor inutilizzati,firstline=0]{esempi/pipe/close_duplicate_fd.c}
+
+\paragraph{Valore di ritorno:}
+In caso di successo, pipe() restituisce 0. In caso di errore restituisce -1, pipefd[2] rimane invariato e viene impostato un valore per \textit{errno}
+
+\paragraph{Esempi:}
+Nel seguente esempio il programma crea una pipe, dopo effettua una fork per creare un processo figlio. Il figlio ottiene un duplicato dei descrittori dei file che fanno riferimento alla pipe creata dal padre. Dopo la fork ogni processo chiude i descrittori di cui non hanno più bisogno. Il padre scrive poi una stringa passata al programma per argomento nella pipe, il figlio la legge e la scrive su \textit{stdout}
+\lstinputlisting[language=C,name=Tipico uso di pipe(),firstline=0]{esempi/pipe/pipe_from_man.c}
+
+
+
+
+
 
 
 

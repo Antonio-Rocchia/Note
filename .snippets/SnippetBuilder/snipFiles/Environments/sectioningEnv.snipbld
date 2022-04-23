@@ -1,34 +1,34 @@
-snippet [chap "Starts a new chapter" bA
+snippet [chap] "Starts a new chapter" bA
 \chapter{$1}
 $0
 
 endsnippet
 
-snippet [sec "Starts a section" bA
+snippet [sec] "Starts a section" bA
 \section{$1}
 $0
 
 endsnippet
 
-snippet [subsec "Starts a subsection" bA
+snippet [subsec] "Starts a subsection" bA
 \subsection{$1}
 $0
 
 endsnippet
 
-snippet [par "Starts a new paragraph" bA
+snippet [par] "Starts a new paragraph" bA
 \paragraph{$1}
 $0
 
 endsnippet
 
-snippet [enum "Ordered list block" bA
+snippet [enum] "Ordered list block" bA
 \begin{enum}
     \item $0
 \end{enum}
 endsnippet
 
-snippet [item "Unordered list block" bA
+snippet [item] "Unordered list block" bA
 \begin{itemize}
     \item $0
 \end{itemize}

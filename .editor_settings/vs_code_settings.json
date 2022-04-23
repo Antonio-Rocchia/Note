@@ -49,4 +49,5 @@
       "cSpell.language": "en,it-IT,it",
       "git.confirmSync": false,
       "explorer.confirmDragAndDrop": false,
+      "window.zoomLevel": 2,
 }
