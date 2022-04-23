@@ -301,6 +301,91 @@ In caso di successo, pipe() restituisce 0. In caso di errore restituisce -1, pip
 Nel seguente esempio il programma crea una pipe, dopo effettua una fork per creare un processo figlio. Il figlio ottiene un duplicato dei descrittori dei file che fanno riferimento alla pipe creata dal padre. Dopo la fork ogni processo chiude i descrittori di cui non hanno più bisogno. Il padre scrive poi una stringa passata al programma per argomento nella pipe, il figlio la legge e la scrive su \textit{stdout}
 \lstinputlisting[language=C,name=Tipico uso di pipe(),firstline=0]{esempi/pipe/pipe_from_man.c}
 
+\subsection{signal()}
+signal - gestione dei segnali secondo ANSI C
+\begin{C}
+#include <signal.h>
+
+typedef void (*sighandler_t)(int);
+
+sighandler_t signal(int signum, sighandler_t handler);
+\end{C}
+
+L'uso di \textit{sighandler\_t} è un estensione di GNU, senza la dichiarazione di signal risulta essere un po più difficile da leggere.
+
+\begin{C}
+void (* signal(int sig, void (*func)())) (int);
+\end{C}
+
+\paragraph{Descrizione:}
+signal() ridireziona la gestione del segnale \textit{signum} all'handler specificato.
+
+L'handler può essere:
+\begin{itemize}
+   \item SIG\_IGN, il segnale è ignorato.
+   \item SIG\_DFL, la gestione del segnale è impostata su default (Vd. sezione successiva)
+   \item Funzione specificata dal programmatore.
+\end{itemize}
+
+Se la gestione del segnale è impostata su una funzione specificata dal programmatore:
+\begin{enumerate}
+    \item Si interrompe l'esecuzione del processo che riceve il segnale.
+    \item Viene eseguito l'handler
+    \item Dopo l'esecuzione dell'handler il processo riprende l'esecuzione da dove si è fermato.
+\end{enumerate}
+
+\paragraph{I segnali UNIX}
+Di seguito una lista di tutti i segnali con i relativi codici in un sistema UNIX
+\lstinputlisting[name=Lista dei segnali]{esempi/signal/segnali_UNIX.txt}
+
+\lstinputlisting[language=C,name=Impostare un handler personalizzato,firstline=0]{esempi/signal/signal_base.c}
+
+I segnali SIGKILL e SIGSTOP non possono essere ignorati e non possono essere gestiti esplicitamente dai processi.
+
+\paragraph{Valore di ritorno}
+Il valore di ritorno in caso di errore è SIG\_ERR e errno viene correttamente impostato.
+
+\subsection{kill() e raise()}
+kill - Invia un segnale ad un processo.
+raise - Invia un segnale al processo che la invoca.
+\begin{C}
+#include <signal.h>
+
+int kill(int pid, int sig);
+int raise(int sig);
+\end{C}
+
+\paragraph{Descrizione}
+kill() può inviare un segnale ad processo o un process group in base al pid specificato:
+
+\begin{itemize}
+    \item Se pid>0, sig è inviato al processo con quel pid.
+    \item Se pid=0, sig è inviato ad ogni processo del process group corrente.
+    \item Se pid=-1, sig è inviato ad ogni processo eccetto per il primo. L'ordine di invio del segnale va dal processo che ha il pid più grande nella tabella dei processi, a quello avente il pid più piccolo.
+    \item Se pid<-1, il segnale è inviato ad ogni processo che ha il process group uguale a valore assoluto del pid.
+\end{itemize}
+
+Se sig=0 il segnale non viene inviato, tuttavia viene fatta ugualmente la ricerca degli errori. Ciò è utile per verificare se un pid è associato a qualche processo.
+
+Il processo che invia il segnale e i processi che lo ricevono devono avere lo stesso user ID effettivo, a meno che il segnale non sia inviato dal super user.
+
+raise() invece invia il segnale sig al processo che la invoca.
+
+\lstinputlisting[name=Tavola dei segnali UNIX]{esempi/signal/segnali_UNIX.txt}
+
+\paragraph{Valore di ritorno:}
+Il caso di successo kill() e raise() restituiscono 0.
+In caso di fallimento restituiscono un valore diverso da 0 e la variabile errno è impostata correttamente.
+
+
+
+
+
+
+
+
+
+
 
 
 
