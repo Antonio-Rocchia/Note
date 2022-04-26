@@ -261,52 +261,6 @@ Todo esempi
 
 %\subsection{exec()}
 
-
-
-\subsection{pipe()}
-pipe - Crea una pipe.
-\begin{C}[name=pipe()]
-#include <unistd.h>
-
-int pipe(int pipefd[2]);
-\end{C}
-
-\paragraph{Descrizione:}
-pipe() crea una pipe, un \textit{canale di comunicazione tra processi unidirezionale} per la trasmissione dei dati. 
-
-L'array \textit{int pipefd[2]} è usato per specificare due \textit{descrittori file (file descriptors)} che rappresentano gli estremi della pipe:
-\begin{itemize}
-    \item pipefd[0] rappresenta il lato di lettura della pipe.
-    \item pipefd[1] rappresenta il lato di scrittura della pipe.
-\end{itemize}
-
-Quando tutti i descrittori di file che si riferiscono al lato scrittura della pipe vengono chiusi, viene scritto \textit{EOF}(end of file) sulla pipe. Il lato lettura potrà leggerlo tramite \textit{read} e restitirà 0.
-
-\lstinputlisting[language=C,name=Chiusura lato scrittura,firstline=0]{esempi/pipe/close_write.c}
-
-Quando vengono chiusi tutti i descrittori di file che si riferiscono al lato lettura, ogni write verso la pipe causera un \textit{SIGPIPE} verso il processo che prova a leggere. Questa situazione potrà quindi essere gestita come ogni altro segnale.
-
-\lstinputlisting[language=C,name=Chiusura lato lettura,firstline=0]{esempi/pipe/close_read.c}
-
-La pipe non ha una dimensione. Il canale di comunicazione della pipe è una \textit{byte stream}, quindi non esiste il concetto di limite del file. Il kernel si occupa di gestire la pipe.
-\begin{itemize}
-    \item Se la pipe è piena, write sarà sospensiva.
-    \item Se la pipe è vuota o non ha la quantità di byte richiesti da una read, read sarà sospensiva.
-\end{itemize}
-
-La capacità effettiva della pipe dipende dall'implementazione. In ogni caso è preferibile che il programma non sia progettato facendo affidamento ad una particolare capacità: Un applicazione dovrebbe essere progettata in modo che il processo che legge consumi i dati appena sono disponibili, cosi che il processo di scrittura non rimanga bloccato.
-
-Un applicazione che usa pipe() e fork() dovrebbe usare close() per chiudere file descriptor duplicati di cui non ha bisogno. Se il processo figlio deve solo scrivere dati, chiudera il lato lettura della pipe. close(pipefd[0]);
-
-\lstinputlisting[language=C,name=Chiudere i file descriptor inutilizzati,firstline=0]{esempi/pipe/close_duplicate_fd.c}
-
-\paragraph{Valore di ritorno:}
-In caso di successo, pipe() restituisce 0. In caso di errore restituisce -1, pipefd[2] rimane invariato e viene impostato un valore per \textit{errno}
-
-\paragraph{Esempi:}
-Nel seguente esempio il programma crea una pipe, dopo effettua una fork per creare un processo figlio. Il figlio ottiene un duplicato dei descrittori dei file che fanno riferimento alla pipe creata dal padre. Dopo la fork ogni processo chiude i descrittori di cui non hanno più bisogno. Il padre scrive poi una stringa passata al programma per argomento nella pipe, il figlio la legge e la scrive su \textit{stdout}
-\lstinputlisting[language=C,name=Tipico uso di pipe(),firstline=0]{esempi/pipe/pipe_from_man.c}
-
 \subsection{signal()}
 signal - gestione dei segnali secondo ANSI C
 \begin{C}
@@ -364,12 +318,41 @@ Cosa succede se arriva un segnale mentre c'è una system call in esecuzione.
 
 Le system call possono essere classificate come slow o non slow. \textit{Le system call slow possono essere interrotte da un segnale}, in questo caso la system call fallisce.
 
+\subsection{alarm()}
+alarm - imposta un timer per l'invio di un segnale
 
+\begin{C}
+#include <unistd.h>
 
+unsigned int alarm(unsigned int seconds);
+\end{C}
 
+\paragraph{Descrizione}
+alarm() invia un segnale SIGALRM al thread che chiama la funzione dopo che sono passati un certo numero di secondi. \textit{Se i secondi sono 0, tutti gli alarm() del thread vengono cancellati.}
 
+Gli alarm() vengono preservati anche dopo un exec, ma non sono ereditati dai processi creati con fork().
 
+Su alcuni sistemi sleep() potrebbe essere implementata tramite alarm(), \textit{pertanto NON mischiare chiamate a sleep() e ad alarm().}
 
+\paragraph{Valore di ritorno:}
+alarm() restituisce il numero di secondi rimanenti prima una precedente chiamata ad alarm() inviasse SIGALRM, oppure 0 se nessun timer era stato precedentemente impostato.
+
+\subsection{sleep()}
+sleep - ferma l'esecuzione per un certo numero di secondi.
+
+\begin{C}
+#include <unistd.h>
+
+unsigned int sleep(insigned int seconds);
+\end{C}
+
+\paragraph{Descrizione:}
+sleep() "addormenta" il thread che chiama questa system call per un numero di secondi reali pari all'intero specificato.
+
+Su linux, sleep() è implementata tramite nanosleep(). Su altri sistemi invece potrebbe essere implementata tramite alarm(), \textit{pertanto NON mischiare chiamate a sleep() e ad alarm().}
+
+\paragraph{Valore di ritorno}
+La funzione restituisce 0 se il numero di secondi passati è effettivamente quello richiesto. Il numero di secondi rimasto se la chiamata viene interrotta da un segnale inviato al thread che chiama sleep. 
 
 \subsection{kill() e raise()}
 kill - Invia un segnale ad un processo.
@@ -402,6 +385,153 @@ raise() invece invia il segnale sig al processo che la invoca.
 \paragraph{Valore di ritorno:}
 Il caso di successo kill() e raise() restituiscono 0.
 In caso di fallimento restituiscono un valore diverso da 0 e la variabile errno è impostata correttamente.
+
+\subsection{open(), creat()}
+open, openat, creat - aprono e (nel caso di creat) possibilmente creano un file.
+
+\begin{C}
+#include <fcntl.h>
+
+int open(const char *pathname, int flags);
+int open(const char *pathname, int flags, mode_t mode);
+
+int creat(const char *pathname, mode_t mode);
+\end{C}
+
+\paragraph{Descrizione:}
+La system call \textit{open()} apre il file specificato da \textit{pathname}. Se il file specificato non esiste e viene specificata la flag \textit{O\_CREAT}, il file viene anche creato.
+
+open() \textit{restituisce un descrittore file}, un intero piccolo e non negativo che rappresenta un elemento nella process's table dei descrittori file aperti. Il descrittore sarà poi usato da altre system call quali read(), write(), lseek(), etc....
+
+Il descrittore file che viene restituito corrisponderà al più piccolo valore di file descriptor disponibile.
+
+All'inizio dell'esecuzione di un processo vengono automaticamente aperti stdin(fd=0), stdout(fd=1), stderr(fd=2). \href{https://stackoverflow.com/questions/22367920/is-it-possible-that-linux-file-descriptor-0-1-2-not-for-stdin-stdout-and-stderr}{Per approfondire}.
+
+Una chiamata ad open \textit{crea un nuovo descrittore di file aperto}, un elemento in una tabella dell'intero sistema che tiene traccia di tutti i file aperti. Il descrittore di file aperto tiene traccia dell'offset(vd. lseek()) e del flag di stato del file(spiegati giù).
+
+\lstinputlisting[language=C,name=Aprire file con open,firstline=0]{esempi/open/open_base.c}
+
+L'argomento \lstinline[language=C]!open(..., int flag, ...)! DEVE INCLUDERE UNO dei seguenti \textit{access mode:} 
+\begin{itemize}
+    \item O\_RDONLY
+    \item O\_WRONLY
+    \item O\_RDWR
+\end{itemize}
+Questi access mode specificano se il file sarà aperto in read-only, write-only o read/write.
+
+In aggiunta si possono opzionalmente concatenare zero o più "file creation flag" e/o "file status flag". Si possono concatenare più flag tramite l'operatore bitwise '|'.
+\lstinline[language=]!open(..., O_RDONLY|O_CREAT|O_LARGEFILE, ...);!
+
+Le flag di creazione file ("file creation flag") sono:
+\begin{itemize}
+    \item O\_CLOEXEC
+    \item O\_CREAT
+    \item O\_DIRECTORY
+    \item O\_EXCL
+    \item O\_NOCTTY
+    \item O\_NOFOLLOW
+    \item O\_TMPFILE
+    \item O\_TRUNC
+\end{itemize}
+
+La differenza tra i "file creation flag" e le "file status flag" è che i flag di creazione coinvolgono la semantica dell'operazione di apertura del file (es. Apri il file in modalità write-only  e se non esiste crealo \lstinline[language=C]!open("path/to/file/", O_WRONLY|O_CREAT)!), mentre le flag di stato coinvolgono la semantica delle successive operazioni di I/O (es. Apri il file in modalità write-only e appendi al file ogni volta che scrivo \lstinline[language=C]!open("path/to/file/", O_WRONLY|O_APPEND)!).
+
+Una chiamata a creat() è equivalente a chiamare open() con i flag \lstinline[language=C]!O_CREAT|O_WRONLY|O_TRUNC!
+
+Il parametro \lstinline[language=C]!open(...,...,mode_t mode);! fa riferimento ai permessi del file. Nel caso di open() questo parametro è opzionale, nel caso di creat() bisogna specificare i permessi del file.
+
+Questi permessi vengono specificati in formato ottale (es. 0777, 0766, etc\ldots). In C abbiamo una libreria che definisce delle macro che possiamo comporre come i flag tramite l'operatore bitwise '|'.
+
+\lstinputlisting[language=C,name=\#include <sys/stat.h>,firstline=0]{esempi/open/modes.c}
+\lstinputlisting[language=C,name=Uso di stat.h,firstline=0]{esempi/open/mode.c}
+\lstinputlisting[language=C,name=output,firstline=0]{esempi/open/mode_prova_out.txt}
+
+%\subsection{read(), write()}
+
+%\subsection{lseek()}
+
+%\subsection{close()}
+
+%\subsection{link(), unlink()}
+
+\subsection{pipe()}
+pipe - Crea una pipe.
+\begin{C}[name=pipe()]
+#include <unistd.h>
+
+int pipe(int pipefd[2]);
+\end{C}
+
+\paragraph{Descrizione:}
+pipe() crea una pipe, un \textit{canale di comunicazione tra processi unidirezionale} per la trasmissione dei dati. 
+
+L'array \textit{int pipefd[2]} è usato per specificare due \textit{descrittori file (file descriptors)} che rappresentano gli estremi della pipe:
+\begin{itemize}
+    \item pipefd[0] rappresenta il lato di lettura della pipe.
+    \item pipefd[1] rappresenta il lato di scrittura della pipe.
+\end{itemize}
+
+Quando tutti i descrittori di file che si riferiscono al lato scrittura della pipe vengono chiusi, viene scritto \textit{EOF}(end of file) sulla pipe. Il lato lettura potrà leggerlo tramite \textit{read} e restitirà 0.
+
+\lstinputlisting[language=C,name=Chiusura lato scrittura,firstline=0]{esempi/pipe/close_write.c}
+
+Quando vengono chiusi tutti i descrittori di file che si riferiscono al lato lettura, ogni write verso la pipe causera un \textit{SIGPIPE} verso il processo che prova a leggere. Questa situazione potrà quindi essere gestita come ogni altro segnale.
+
+\lstinputlisting[language=C,name=Chiusura lato lettura,firstline=0]{esempi/pipe/close_read.c}
+
+La pipe non ha una dimensione. Il canale di comunicazione della pipe è una \textit{byte stream}, quindi non esiste il concetto di limite del file. Il kernel si occupa di gestire la pipe.
+\begin{itemize}
+    \item Se la pipe è piena, write sarà sospensiva.
+    \item Se la pipe è vuota o non ha la quantità di byte richiesti da una read, read sarà sospensiva.
+\end{itemize}
+
+La capacità effettiva della pipe dipende dall'implementazione. In ogni caso è preferibile che il programma non sia progettato facendo affidamento ad una particolare capacità: Un applicazione dovrebbe essere progettata in modo che il processo che legge consumi i dati appena sono disponibili, cosi che il processo di scrittura non rimanga bloccato.
+
+Un applicazione che usa pipe() e fork() dovrebbe usare close() per chiudere file descriptor duplicati di cui non ha bisogno. Se il processo figlio deve solo scrivere dati, chiudera il lato lettura della pipe. close(pipefd[0]);
+
+\lstinputlisting[language=C,name=Chiudere i file descriptor inutilizzati,firstline=0]{esempi/pipe/close_duplicate_fd.c}
+
+\paragraph{Valore di ritorno:}
+In caso di successo, pipe() restituisce 0. In caso di errore restituisce -1, pipefd[2] rimane invariato e viene impostato un valore per \textit{errno}
+
+\paragraph{Esempi:}
+Nel seguente esempio il programma crea una pipe, dopo effettua una fork per creare un processo figlio. Il figlio ottiene un duplicato dei descrittori dei file che fanno riferimento alla pipe creata dal padre. Dopo la fork ogni processo chiude i descrittori di cui non hanno più bisogno. Il padre scrive poi una stringa passata al programma per argomento nella pipe, il figlio la legge e la scrive su \textit{stdout}
+\lstinputlisting[language=C,name=Tipico uso di pipe(),firstline=0]{esempi/pipe/pipe_from_man.c}
+
+%\subsection{mkfifo()}
+
+%\subsection{access}
+
+%\subsection{stat}
+
+%\subsection{chmod}
+
+%\subsection{chdir}
+
+%\subsection{opendir}
+
+%\subsection{readdir}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
