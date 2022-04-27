@@ -1,0 +1,4 @@
+snippet _chap "Starts a new chapter" bA
+\chapter{$1}
+$0
+endsnippet

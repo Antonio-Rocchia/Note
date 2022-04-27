@@ -1,0 +1,5 @@
+snippet #enum "Enumerate environment" bA
+\begin{enumerate}
+$0
+\end{enumerate}
+endsnippet

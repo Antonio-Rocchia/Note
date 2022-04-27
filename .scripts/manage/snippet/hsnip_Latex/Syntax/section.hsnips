@@ -1,0 +1,4 @@
+snippet _sec "Starts a new section" bA
+\section{$1}
+$0
+endsnippet

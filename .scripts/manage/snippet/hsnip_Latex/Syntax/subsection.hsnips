@@ -1,0 +1,4 @@
+snippet _subsec "Starts a new subsection" bA
+\subsection{$1}
+$0
+endsnippet

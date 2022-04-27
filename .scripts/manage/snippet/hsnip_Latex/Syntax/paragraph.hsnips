@@ -1,0 +1,4 @@
+snippet _par "Starts a new paragraph" bA
+\paragraph{$1}
+$0
+endsnippet
