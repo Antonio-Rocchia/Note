@@ -1,0 +1,327 @@
+\RequirePackage[l2tabu, orthodox]{nag}
+
+\documentclass
+[10pt,        % Font size(10 default)
+ a4paper,     % Paper size and format
+ %draft,      % Draft mode will improve compilation time but not render figures
+ onecolumn,   % Onecolumn or two columns
+ fleqn,       % fleqn=left align of math formulas
+ %leqno,      % Math formula counter to the left of the formula(right default)
+ oneside,     % When printing, oneside=fronte twoside=fronte-retro
+ notitlepage, % Does not reserve a page for the title, titlepage does
+ openany      % Open chapter anywhere, openright open on right page
+]{article}    % article, book, report, letter, beamer
+
+%region Preamble
+
+%region Metadata
+\title{Sistemi operativi: Lezione 20}
+\author{Antonio Rocchia}
+%endregion Metadata
+
+%region Language and encoding settings
+\usepackage[utf8]{inputenc}                 % Input encoding for characters written in the .tex document
+\usepackage[T1]{fontenc}                    % Output encoding for characters written in the .pdf document
+\usepackage[italian, english]{babel}        % Languages used in this file, switch with \selectlanguage{language}, default is italian
+%endregion Language and encoding settings
+
+%region Page layout settings
+%region Page dimension, margin, header and footer dimensions
+\usepackage{geometry}
+\geometry{
+paper=a4paper,              % Type of paper used
+hmargin=2cm,                % Shorthand for left and right margin
+bindingoffset=1cm,          % Offset from page binding to the start of the inner margin
+top=1cm,                    % Top margin
+bottom=0.8cm,               % Bottom margin
+includeheadfoot=true,       % Include header and footer in the body size
+headsep=1cm,                % Distance from header and main text
+headheight=12pt,            % Height of the header
+footskip=2cm,               % Distance from the bottom of the foot the end of body
+}
+%endregion Page dimension, margin, header and footer dimensions
+
+%region Header and footer content
+\usepackage{fancyhdr}
+\pagestyle{plain}
+%endregion Header and footer content
+
+%region Microtype
+\usepackage[final,babel=true]{microtype}
+%endregion Microtype
+
+%region Parskip
+\usepackage{parskip}
+%endregion Parskip
+
+%endregion Page layout settings
+
+%region Hyperlinks
+\usepackage{hyperref}
+\makeatletter
+\hypersetup{
+colorlinks=true,
+linkcolor=blue,
+filecolor=magenta,
+urlcolor=blue,
+pdftitle={\@title},
+pdfauthor={\@author}
+}
+\makeatother
+    
+\urlstyle{same}
+%endregion Hyperlinks
+
+%endregion Preamble
+
+%region modules
+%region Code module
+\usepackage[dvipsnames]{xcolor} % Used by: listings
+\usepackage{listings} % Code display "https://www.ctan.org/pkg/listings"
+\lstset{
+    backgroundcolor=\color{White},
+    basicstyle=\ttfamily,
+    identifierstyle=\color{Black},
+    stringstyle=\color{Green},
+    keywordstyle=\color{NavyBlue},
+    commentstyle=\color{Gray},
+    extendedchars=true,
+    showstringspaces=false,
+    % caption
+    title=\lstname,
+    % frames
+    frame=lines,
+    breaklines=true,
+    postbreak=\mbox{\textcolor{red}{$\hookrightarrow$}\space},
+}
+
+\lstnewenvironment{C++}[1][]
+    {\lstset{language=C++},#1}
+    {}
+
+\lstnewenvironment{C}[1][]
+    {\lstset{language=C},#1}
+    {}
+
+%region Snippets 
+% snippet [C++] "C++ Code block" bA
+% \begin{C++}[name=]
+% 	
+% \end{C++}
+% endsnippet
+
+% snippet [C] "C Code block" bA
+% \begin{C}[name=]
+% 	
+% \end{C}
+% endsnippet
+
+% snippet code_i "Code Inline" bA
+% \lstinline[language=]!"code"!
+% endsnippet
+
+% snippet import_code "Import code from a file" bA
+% \lstinputlisting[language=,name=]{}
+% endsnippet
+%endregion Snippets
+%endregion modules
+
+\begin{document}
+%region Title and TOC
+\microtypesetup{protrusion=false} % disables protrusion locally in the document
+\maketitle          
+\tableofcontents % prints Table of Contents
+\microtypesetup{protrusion=true} % enables protrusion
+%endregion Title and TOC
+
+\section{Shell}
+La shell è un programma che permette ad un utente di interagire con il sistema operativo tramite un interfaccia testuale.
+Offre non solo un idle per mandare in esecuzione eseguibili ma è anche un linguaggio di scripting.
+
+\subsection{Differenti tipi di shell}
+Esistono molti tipi di shell:
+\begin{itemize}
+    \item Bash
+    \item C-shell
+    \item Z-shell
+\end{itemize}
+La più usata(default su unix) è bash. Sono in realtà degli eseguibili sul sistema operativo. L'utente può scegliere la sua shell, la schelta viene salvata in /etc/passwd.
+
+La shell di login è quella che richiede inizialmente i dati di accesso all'utente. Per ogni utente viene generato un processo dedicato, indipendentemente se esso sia un DE o una shell.
+
+\subsection{Ciclo di esecuzione della shell}
+
+\begin{lstlisting}
+    Prendi da slide.
+\end{lstlisting}
+
+\subsection{Accesso al sistema}
+Dopo l'accesso al sistema, il sistema prende da /etc/passwd le informazione dell'utente e lancia la shell scelta.
+
+\paragraph{Comando passwd}
+Il comando passwd permette di cambiare password se si conosce la precedente. L'utente admin può forzare questo cambiamento, tuttavia non può conoscere la password degli utenti.
+
+\subsection{Logout dal sistema}
+Per uscire da una qualsiasi shell si può usare il comando exit(). Per uscire dalla shell di login si può usare il comando logout o digitare CTRL+C
+
+\subsection{Esecuzione di un comando}
+Quando una shell manda in esecuzione un comando essa esegue una fork del processo shell e poi esegue un istruzione exec per mandare in esecuzione il codice dell'eseguibile richiesto.
+
+
+Grazie a questo meccanismo si può usare la shell come interprete di programmi definiti dall'utente. 
+
+Solitamente i comandi vengono lanciati in \textit{foreground} (la shell si mette in attesa, aspettanto che il comando finisca la sua esecuzione), tuttavia è possibile chiedere alla shell di eseguire i comandi in \textit{background}
+
+\begin{C}
+loop forever
+<login>
+do{
+    scanf(comando)
+    pid=fork()
+    if(pid==0)
+     execlp(comando)
+}
+\end{C}
+
+\subsection{Comandi input/output}
+Esempi di comandi UNIX:
+\begin{itemize}
+    \item grep, ricerca di testo
+    \item tee, scrive l'input sia su file che su output
+    \item sort, Ordina alfabeticamente le righe
+    \item rev, inverte l'ordine delle linee di file
+    \item cut, Selezione colonne da file
+    \item awk, ricerca di testo ed esecuzione di comandi \lstinline[language=bash]!awk '/^In/ { print }' file1!
+    \item expr, valutazione di espressioni 
+\end{itemize}
+
+
+\subsection{Ridirezione di comandi}
+Possiamo ridirezionare l'input/output di comandi su file. In bash abbiamo tre operatori di ridirezionamento:
+\begin{itemize}
+    \item '<', ridireziono in lettura -> "comando < file\_input"
+    \item '>', ridireziono in scrittura(tronco) -> "comando > file\_output"
+    \item '>>', ridireziono in scrittura(append) -> "comando > file\_output"
+\end{itemize}
+
+\begin{lstlisting}[language=bash]
+ls -l > file
+sort < file > file2
+echo ciao >> file
+\end{lstlisting}
+
+Le stringhe possono essere delimitate opzionalmente con i doppi apici (").
+\lstinline[language=bash]!> file1! crea un file chiamato file1
+
+\subsection{Piping}
+L'output di un programma può essere ridirezionato verso l'input di un altro. In DOS viene creato un file temporaneo dove viene salvato l'output del primo comando che viene usato come input per il secondo. In unix viene usata una pipe.
+
+L'operatore di piping è '|'.
+
+\begin{lstlisting}[language=bash, name=Conta gli utenti collegati]
+who | wc -l
+\end{lstlisting}
+\begin{lstlisting}[language=bash, name=Un esempio di piping complesso]
+ls -l | grep ^d | rev | cut -d' ' -f1 | rev
+\end{lstlisting}
+Questo comando lista i file del direttorio corrente, tale output viene filtrato da grep che prende solo le righe che iniziano con 'd' ovvero le directories. Invertiamo l'ordine della lista. Usiamo cut per prendere il primo campo che in questo caso è l'ultimo campo del comando ls che è il nome del file, poiche abbiamo usato rev dobbiamo reinvertire il nome del file per renderlo leggibile.
+
+\subsection{Metacaratteri}
+La shell riconoscere dei caratteri speciali (wild card)
+\begin{itemize}
+    \item '*' viene interpretato come una qualunque stringa di 0 o più caratteri.
+    \item '?' un qualunque carattere singolo
+    \item '[zfc]' un qualunque carattere compreso tra quello nell'insieme.
+    \item '[a-d]' un qualunque carattere compreso nell'intervallo
+    \item '\#' un commanto fino alla fine della linea
+    \item '\' Escape, segnala di non interpretare il carettere successivo come carattere speciale. 
+\end{itemize}
+\lstinline[language=bash]!ls ese*! elenca tutti i file che iniziano con la stringa ese.
+\lstinline[language=bash]!ls [a-p,1-7]*[c,f,d]?! elenca i file i cui nomi hanno come iniziale un carattere compreso tra a e p oppure 1 e 7 e il cui penultimo carattere sia c, f o d.
+\lstinline[language=bash]!ls *\**! elenca i file che contegono nel nome, in qualsiasi posizione il carattere *
+
+\subsection{Variabili nella shell}
+In ogni shell è possibile definire delle variabili che possono essere richiamate dai programmi successivi.
+
+La shell fa una distinzione di semantica nelle variabili. Quando definiamo il nome della variabile scriviamo VAR=<valore>. Quando recuperiamo il valore di var scriviamo \$VAR.
+\lstinline[language=bash]!echo $VAR! da come output valore mentre \lstinline[language=bash]!echo VAR! da come output VAR
+
+Un assegnamento tra variabili è dichiarato come \lstinline[language=bash]!VAR=$OTHER_VAR!, assegnamo a VAR il valore di OTHER\_VAR.
+
+\begin{lstlisting}[name=Appendere una directory corrente alla PATH]
+PATH=$PATH:/usr/local/bin
+\end{lstlisting}
+In questo esempio assegno alla variabile PATH il valore di PATH a cui aggiungo 'usr/local/bin' alla path.
+
+\subsection{Ambiente di esecuzione}
+Ogni shell esegue in un ambiente in cui possiamo definire variabili, le \textit{variabili di ambiente}. Ogni shell condivide il proprio ambiente di esecuzione con i figli che genera.
+
+\lstinline[language=bash]!set! stampa tutte le variabili d'ambiente definite al momento in cuila shell esegue il comando.
+
+\subsection{Espressioni}
+Nella shell un blocco delimitato tra due ` ` (backtick) viene interpretato come un comando. Il backtick dice alla shell di valutare l'espressione all'interno del blocco e di sostituire il valore valutato come stringa nel punto in cui è presente il blocco.
+
+\begin{lstlisting}[language=bash]
+echo 3 + 1 = `expr 3 + 1`
+echo 3 + 1 = expr 3 + 1
+\end{lstlisting}
+da come output 
+\begin{lstlisting}[language=bash]
+3 + 1 = 4
+3 + 1 = expr 3 + 1
+\end{lstlisting}
+
+\section{Shell scripting}
+Si possono creare file che contengono comandi da eseguire in sequenza.
+\subsection{Espansione}
+Quando mettiamo in esecuzione i comandi su una shell, prima di eseguirlo la shell prepara e collega i comandi.
+
+Sequenza dei passi di sostituzione:
+\begin{enumerate}
+    \item Sostituzione dei comandi tra backquote
+    \item Sostituzione delle variabili e parametri
+    \item Sostituzione dei metacaratteri nelle stringhe.
+\end{enumerate}
+
+In alcuni casi è necessario privare i caratteri del loro significato
+\begin{itemize}
+    \item \ protegge dall'espansione il carattere successivo
+    \item '' protegge dall'espansione qualsiasi cosa ci sia all'interno
+    \item "" proteggono dalle espansioni qualsiasi cosa ci sia all'interno ad eccezione di \$, ` e \
+\end{itemize}
+
+Ad esempio 
+\lstinline[language=bash]!echo "<`pwd`>"! mi restituisce <home/rokomia> mentre
+\lstinline[language=bash]!echo '<`pwd`>'! mi restituisce <`pwd`>
+
+\subsection{File comandi}
+Un file comandi è composto da una sequenza di comandi (uno per riga) e può contenere:
+\begin{itemize}
+    \item Statement per il controllo di flusso
+    \item variabili
+    \item passaggio di argomenti
+\end{itemize}
+Gli statement disponibili dipendono dalla shell che si utilizza. I file comandi vengono interpretati e non compilati. Ogni file comandi deve essere eseguibile (chmod +x).
+
+I comandi contenuti nel file vengono eseguiti in sequenza da una shell dedicata, creata appositamente per l'esecuzione del file comandi dalla shell che chiama il file comandi. La shell che esegue il file comandi genera poi una shell per ogni comando della sequenza specificata, rispettando le regole di esecuzione in foreground o background.
+
+\subsection{Scelta della shell}
+All'inizio di un file comandi si aggiunge una direttiva da interprete per scegliere quale shell usare. la sintassi è
+\begin{lstlisting}
+#!<shell da usare>
+\end{lstlisting}
+
+La direttiva per la shell bash è #!/bin/bash
+
+\subsection{Assegnamento di variabili}
+Per assegnare una variabile un nome per la variabile seguito da un '=' e poi il valore della variablile, SENZA SPAZI.
+
+\begin{lstlisting}
+#!/bin/bash
+
+name=Antonio
+echo $name
+\end{lstlisting}
+
+
+\end{document}
