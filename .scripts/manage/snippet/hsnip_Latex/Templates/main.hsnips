@@ -1,4 +1,4 @@
-snippet template::main "main file latex template" b
+snippet template::main "main file latex template" bA
 \RequirePackage[l2tabu, orthodox]{nag}
 
 \documentclass
@@ -8,26 +8,18 @@ snippet template::main "main file latex template" b
  onecolumn,   % Onecolumn or two columns
  fleqn,       % fleqn=left align of math formulas
  %leqno,      % Math formula counter to the left of the formula(right default)
- twoside,     % When printing, oneside=fronte twoside=fronte-retro
+ oneside,     % When printing, oneside=fronte twoside=fronte-retro
  notitlepage, % Does not reserve a page for the title, titlepage does
- openany      % Open chapter anywhere, openright open on right page
-]{$3}    % article, book, report, letter, beamer
+ %openany     % Open chapter anywhere, openright open on right page
+]{article}    % article, book, report, letter, beamer
 
-%region Preamble
-
-%region Metadata
 \title{$2}
 \author{$1}
-%endregion Metadata
 
-%region Language and encoding settings
 \usepackage[utf8]{inputenc}                 % Input encoding for characters written in the .tex document
 \usepackage[T1]{fontenc}                    % Output encoding for characters written in the .pdf document
 \usepackage[italian, english]{babel}        % Languages used in this file, switch with \selectlanguage{language}, default is italian
-%endregion Language and encoding settings
 
-%region Page layout settings
-%region Page dimension, margin, header and footer dimensions
 \usepackage{geometry}
 \geometry{
 paper=a4paper,              % Type of paper used
@@ -40,24 +32,14 @@ headsep=1cm,                % Distance from header and main text
 headheight=12pt,            % Height of the header
 footskip=2cm,               % Distance from the bottom of the foot the end of body
 }
-%endregion Page dimension, margin, header and footer dimensions
 
-%region Header and footer content
 \usepackage{fancyhdr}
 \pagestyle{plain}
-%endregion Header and footer content
 
-%region Microtype
 \usepackage[final,babel=true]{microtype}
-%endregion Microtype
 
-%region Parskip
-/usepackage{parskip}
-%endregion Parskip
+\usepackage{parskip}
 
-%endregion Page layout settings
-
-%region Hyperlinks
 \usepackage{hyperref}
 \makeatletter
 \hypersetup{
@@ -71,21 +53,12 @@ pdfauthor={\@author}
 \makeatother
     
 \urlstyle{same}
-%endregion Hyperlinks
-
-%endregion Preamble
-
-%region modules
-
-%endregion modules
 
 \begin{document}
-%region Title and TOC
 \microtypesetup{protrusion=false} % disables protrusion locally in the document
 \maketitle          
 \tableofcontents % prints Table of Contents
 \microtypesetup{protrusion=true} % enables protrusion
-%endregion Title and TOC
 
 $0
 
