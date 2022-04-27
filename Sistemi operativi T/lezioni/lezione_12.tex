@@ -1,0 +1,321 @@
+\RequirePackage[l2tabu, orthodox]{nag}
+
+\documentclass
+[10pt,        % Font size(10 default)
+ a4paper,     % Paper size and format
+ %draft,      % Draft mode will improve compilation time but not render figures
+ onecolumn,   % Onecolumn or two columns
+ fleqn,       % fleqn=left align of math formulas
+ %leqno,      % Math formula counter to the left of the formula(right default)
+ oneside,     % When printing, oneside=fronte twoside=fronte-retro
+ notitlepage, % Does not reserve a page for the title, titlepage does
+ %openany      % Open chapter anywhere, openright open on right page
+]{article}    % article, book, report, letter, beamer
+
+%region Preamble
+
+%region Metadata
+\title{Sistemi operativi: Lezione 12}
+\author{Antonio Rocchia}
+%endregion Metadata
+
+%region Language and encoding settings
+\usepackage[utf8]{inputenc}                 % Input encoding for characters written in the .tex document
+\usepackage[T1]{fontenc}                    % Output encoding for characters written in the .pdf document
+\usepackage[italian, english]{babel}        % Languages used in this file, switch with \selectlanguage{language}, default is italian
+%endregion Language and encoding settings
+
+%region Page layout settings
+%region Page dimension, margin, header and footer dimensions
+\usepackage{geometry}
+\geometry{
+paper=a4paper,              % Type of paper used
+hmargin=2cm,                % Shorthand for left and right margin
+bindingoffset=1cm,          % Offset from page binding to the start of the inner margin
+top=1cm,                    % Top margin
+bottom=0.8cm,               % Bottom margin
+includeheadfoot=true,       % Include header and footer in the body size
+headsep=1cm,                % Distance from header and main text
+headheight=12pt,            % Height of the header
+footskip=2cm,               % Distance from the bottom of the foot the end of body
+}
+%endregion Page dimension, margin, header and footer dimensions
+
+%region Header and footer content
+\usepackage{fancyhdr}
+\pagestyle{plain}
+%endregion Header and footer content
+
+%region Microtype
+\usepackage[final,babel=true]{microtype}
+%endregion Microtype
+
+%region Parskip
+\usepackage{parskip}
+%endregion Parskip
+
+%endregion Page layout settings
+
+%region Hyperlinks
+\usepackage{hyperref}
+\makeatletter
+\hypersetup{
+colorlinks=true,
+linkcolor=blue,
+filecolor=magenta,
+urlcolor=blue,
+pdftitle={\@title},
+pdfauthor={\@author}
+}
+\makeatother
+    
+\urlstyle{same}
+%endregion Hyperlinks
+
+%endregion Preamble
+
+%region modules
+
+%endregion modules
+
+\begin{document}
+%region Title and TOC
+\microtypesetup{protrusion=false} % disables protrusion locally in the document
+\maketitle          
+\tableofcontents % prints Table of Contents
+\microtypesetup{protrusion=true} % enables protrusion
+%endregion Title and TOC
+
+\section{Il file system}
+Il file system è la componente del SO che fornisce agli utenti un meccanismo di accesso alle informazioni allocate in memoria di massa.
+
+Il file system mette a disposizione della astrazioni per rendere più intuitivo l'uso di quella risorsa:
+\begin{itemize}
+    \item File: unità logica di memorizzazione
+    \item Direttorio: insieme di file che consente all'utente di raggruppare file e/o altri direttori
+    \item Partizione: Consente di associare più file system ad un dispositivo fisico.
+\end{itemize}
+
+Questa astrazione permette di interfacciarci con un file system in modo omogeneo con qualsiasi tipo di dispositivo. (es. PC, Pennetta usb, etc\ldots)
+
+\section{Organizzazione del file system}
+Il file system è rappresentata da un insieme di compontenti qui rappresentati in ordine dal più alto livello di astrazione al più passo
+\begin{enumerate}
+    \item Applicativi
+    \item Struttura logica
+    \item Accesso
+    \item Organizzazione fisica
+    \item Dispositivo virtuale
+    \item Hardware
+\end{enumerate}
+
+\subsection{Struttura logica}
+Fornisce una rappresentazione astratta delle informazioni memorizzate sul file system basata su file, directory e partizioni.
+
+Ad esempio possiamo cambiare il nome di un particolare file, metterlo in una o più directory.
+
+\subsubsection{File}
+Un file è un contenitore di informazioni. Il file system offre un sistema di \textit{naming} che consente di individuare il file attraverso uno o più(come in linux) \textit{nomi simbolici} che può essere usato nell' invocazione di comandi.
+
+\subsubsection{Attributi di un file}
+Un file in generale ha i seguenti attributi:
+\begin{itemize}
+    \item indirizzo, puntatore/i verso i blocchi di memoria secondaria in cui il file è effettivamente allocato.
+    \item dimensione.
+    \item data ed ora di creazione e ultima modifica.
+    \item tipo del file che consente di classificarli.
+    \begin{itemize}
+        \item di testo
+        \item eseguibili
+        \item \dots
+    \end{itemize}
+    \item utente proprietario, in un sistema multi-utente
+    \item protezione e diritti di accesso.
+\end{itemize}
+
+\subsubsection{Descrittore del file}
+Il sistema deve poter salvare gli attributi di ogni file in opportune strutture dati collocate in memoria secondaria, in modo da rendere questi attributi permanenti anche per le sessioni successive.
+
+Questa struttura si chiama \textit{Descrittore del file}, \textit{I-node in Unix}. I descrittori del file di ogni file sono salvati in una seconda struttura, \textit{I-list in Unix}
+
+In alcuni sistemi l'estensione inclusa nel file rappresenta il suo tipo. Questo aiuta il file system a gestire quel tipo di informazioni. In Unix non esiste questo tipo di classificazione.
+
+\subsubsection{Direttorio o Directory}
+Consente di raggruppare file. Una directory può contenere più file ed è rappresentata nel file system da un opportuna struttura dati.
+
+Questa struttura associa al nome di ogni file contenuto i puntatori che consentono di localizzare quel file nella memoria di massa.
+
+\subsubsection{Operazioni sui direttori}
+Operazioni realizzate nella struttura logica.
+\begin{itemize}
+    \item Creazione e cancellazione di directory (mkdir e rmdir)
+    \item Aggiunta e rimozione di file alla directory
+    \item Listing, elenco di tutti i file contenuti nella directory (ls)
+    \item Attraversamento della directory (cd)
+    \item Ricerca di file in directory (find)
+\end{itemize}
+
+\subsubsection{Tipi di implentazione per i direttori}
+\begin{itemize}
+    \item \textbf{Struttura ad un livello}, una sola directory per ogni file system dove colloco tutti i miei file. Ora obsoleta data la mole di file contenuta in ogni sistema. Uno dei problemi può essere trovare nomi simbolici diversi per ogni file e proteggere ogni file per utenti diversi
+    \item \textbf{Struttura a due livelli}. Obsoleta, usata nei primi sistemi multi-utente, una directory principale che contiene una directory per ogni utente. Presenta gli stessi problemi della struttura ad un livello, anche se i meccanismi di protezione sono più facili da realizzare.
+    \item \textbf{Struttura ad albero}. Una struttura moderna formata da una directory radice da cui si forma una gerarchia di directory in modo ricorsivo. Esiste un direttorio per ogni utente ed ogni utente può definire un numero arbitrario di livelli.
+    \item \textbf{Struttura a grafo aciclico}. Simile alla struttura ad albero, la differenza sostanziale consiste nel poter posizionare un file in più direttori diversi. \textit{Uno stesso file può essere riferito con nomi diversi} (Questo file ha due \textit{link} diversi). Questo sistema è quello implementato dai sistemi Unix.
+\end{itemize}
+
+\subsubsection{Partizioni}
+Una partizione è l'astrazione che si associa univocamente ad una struttura logica.
+
+Un disco può ospitare più partizioni. Esiste in oltre la possibilità di collegare a livello logico più partizioni in un unica gerarchia tramite il meccanismo di mounting. Si sceglie un \textit{punto di mounting} per collegare la radice del file system montato in un nodo del file system che monta.
+
+Dato che il sistema di montaggio sostituisce il nodo scelto con la radice del file system montato, per evitare che questo nasconda dei file che vorremo accedere il sistema operativo mette a disposizione delle directory specifiche (\\mnt in linux) dove montare altre partizioni
+
+\subsection{Accesso}
+Definisce un unità di trasferimento per leggere e scrivere i file, il \textit{record logico}. 
+
+A differenza del \textit{blocco} il \textit{record logico} è un unità di lettura/scrittura a livello di accesso e non ha nulla a che fare con l'effettiva allocazione delle informazioni 
+Si occupa di fornire meccanismi per manipolare il file system tramite:
+\begin{itemize}
+    \item Metodi di accesso:
+    \begin{itemize}
+        \item sequenziale
+        \item casuale
+        \item indice
+    \end{itemize}
+    \item Meccanismi di protezione
+\end{itemize}
+
+\subsubsection{Operazioni sui file}
+Il Sistema operativo si occupa di gestire l'accessoo \textit{on-line} ai file. Ogni volta che un processo modifica un file, quel cambiamento è immediatamente visibile a tutti gli altri processi.
+
+Le tipiche operazioni sui file sono:
+\begin{itemize}
+    \item \textbf{Creazione}: allocazione di un file in memoria secondaria e inizializzazione dei suoi attributi
+    \item \textbf{Modificare}:
+    \begin{itemize}
+        \item \textbf{Lettura}
+        \item \textbf{Scrittura}
+    \end{itemize}
+    \item \textbf{Cancellazione}
+\end{itemize}
+
+Ogni operazione richiederebbe la localizzazione del file sulla memoria secondaria. Quando un utente richiede una di queste operazione si controlla se tale utente può fare questa operazione e dopo eventualmente si deve effettuare l'operazione stessa. Per farlo abbiamo bisogno delle informazioni contenute nel descrittore del file.
+\begin{itemize}
+    \item Indirizzi dei record logici a cui accedere
+    \item Attributi del file (diritti di accesso\ldots)
+\end{itemize}
+
+\subsubsection{Tabella dei file aperti}
+Le operazioni di accesso alla memoria secondaria sono molto costose. Per questo nei sistemi operativi moderni, per migliorare l'efficienza, \textit{il file system} mantiene una struttura dati che \textit{registra i file attualmente in uso}.
+
+Viene fatto il \textit{memory mapping} dei file aperti. I file aperti o porzioni di essi sono temporaneamente copiati in memoria centrale (che funge da buffer) per avere una velocità di accesso maggiore.
+
+Quando il file viene \textbf{aperto},
+\begin{itemize}
+    \item introduciamo un nuovo elemento nella tabella dei file aperti
+    \item il contenuto del file, o parte di esso, viene \textit{mappato} in memoria centrale.
+\end{itemize} 
+
+Quando il file viene \textbf{chiuso},
+\begin{itemize}
+    \item Salviamo il file in memoria secondaria
+    \item Eliminiamo l'elemento corrispondente dalla tabella dei file aperti. 
+\end{itemize}
+
+\subsubsection{Struttura interna dei file}
+A livello di organizzazione fisica il file viene suddiviso in blocchi(o record fisici).
+
+A livello logico invece le applicazioni vedono i file come un insieme di record logici.
+
+Il record logico è un unità di trasferimento logico nelle operazioni di accesso al file. Sono di dimensione variabile. Le caratteristiche del record logici sono indipendenti da quelli dei record fisici, ma in generale i record fisici sono molto più grandi dei record logici.
+
+\subsubsection{Metodi di accesso}
+Esistono vari metodi di accesso ai file:
+\begin{itemize}
+    \item Accesso sequenziale
+    \item Accesso diretto
+    \item Accesso ad indice
+\end{itemize}
+
+Il metodo di accesso è indipendente dal tipo di dispositivo utilizzato e dalla tecnica di allocazione dei record fisici in memoria secondaria.
+
+\subsubsection{Accesso sequenziale}
+In questo tipo di astrazione un file è una \textit{sequenza} di record logici.
+
+Le operazioni di accesso sono del tipo:
+\begin{itemize}
+    \item readnext (lettura del porssimo record logico nella sequenza)
+    \item e writenext (scrittura del prossimo record logico nella sequenza)
+\end{itemize}  
+\`(E) necessario registrale la posizione corrente nella sequenza attraverso un I/O pointer. Ogni operazione di lettura/scrittura posizione il puntatore sull'elemento successivo della sequenza.
+
+Unix utilizza questo tipo di accesso.
+
+\subsubsection{Accesso diretto}
+Il file è un insieme di record logici. Si può procedere verso un particolare record logico specificandone il numero.
+
+Le operazioni sono del tipo: 
+\begin{itemize}
+    \item read(i) lettura del record logico i
+    \item write(i) scrittura del record logico i
+\end{itemize}
+Al contrario dell'accesso sequenziale, con l'accesso diretto posso raggiungere una posizione arbitraria nel file senza doverlo necessariamente scorrere l'intero file. Questo è utile quando ho bisogno di estrarre poche informazioni da grossi file, ad esempio in un database.
+
+\subsubsection{Accesso ad indice}
+Ad ogni file viene associata una struttura dati che contiene l'indice delle informazioni contenute. In questo tipo di accesso si presume che il file abbia una determinata struttura, si conservano delle chiavi a cui vengono associate dei puntitatori ai record logici del file contenti le informazioni desiderate
+
+\subsubsection{File system e protezione}
+Il sistema operativo permette al proprietario del file di controllare quali azioni sono consentine sul file e da parte di quali utenti.
+
+\subsubsection{Liste di accesso e gruppi}
+In UNIX ci sono tre modalità di accesso: 
+\begin{itemize}
+    \item read
+    \item write
+    \item execute
+\end{itemize}
+e tre classi di utenti:
+\begin{enumerate}
+    \item owner access
+    \item group access
+    \item public access
+\end{enumerate}
+L'amministratore del sistema può creare dei gruppi con nomi unici e assegnare/rimuovere utenti da tali gruppi. 
+
+\subsection{Organizzazione fisica}
+Si occupa di rappresentare il file system nella memoria secondaria:
+\begin{itemize}
+    \item Realizza i descrittori e li organizza.
+    \item Alloca i record logici impaccati i record fisici nella memoria secondaria e si occupa di gestire lo spazio libero.
+\end{itemize}
+
+\subsubsection{Metodi di allocazione}
+Il blocco o record fisico è l'unità di allocazione su memoria secondaria. Ogni blocco contiene un insieme di record logici contigui. Ogni blocco può contenere i record logici di al più un file.
+
+Esistono varie strategie di allocazione:
+\begin{itemize}
+    \item Allocazione contigua
+    \item Allocazione a lista
+    \item Allocazione ad indice
+\end{itemize}
+
+\subsubsection{Allocazione contigua}
+Ogni file è mappato su un insieme di blocchi fisicamente contigui.
+
+I vantaggi di questa strategia sono:
+\begin{itemize}
+    \item Localizzare un blocco appartenente ad un file è poco costoso a livello computazionale, basta conoscere la posizione del primo blocco appartenente al file e calcolare la posizione del blocco ricercato rispetto ad esso.
+    \item Si può realizzare l'accesso sequenziale o l'accesso diretto.
+\end{itemize}
+Gli svantaggi sono:
+\begin{itemize}
+    \item Individuare spazi di memoria libera di blocchi contigui è un operazione onerosa. Dovrei ispezionare ogni sequenza di blocchi liberi per conoscerne la lunghezza.
+    \item Si può incorrere nella \textit{frammentazione esterna}, man mano che si riempie il disco rimangono zone contigue sempre più piccole, a volte inutilizzabili.
+\end{itemize}
+
+\subsection{Dispositivo virtuale}
+Presenta una visione astratta del dispositivo che appare come una sequenza di \textit{blocchi} di dimensione fissa e costante che fungono da unità di allocazione.
+
+
+
+\end{document}
