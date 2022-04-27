@@ -96,28 +96,53 @@ for dir in snippetDirectories:
                 out_path = Path(out_dir.as_posix() + "/" + out_name)
                 print("dir name = " + out_dir.as_posix())
             else:
-                print("Warning, no output file name defined, " + out_dir + " will be used")
+                print("Warning, no output file name defined, " + out_dir.as_posix() + " will be used")
             if(tryParsingKey("link_to_config", data)):
-                soft_link_path = Path(data["link_to_config"]).expanduser()
+                soft_link_path = Path(data["link_to_config"].strip()).expanduser()
                 print("link to = " + soft_link_path.as_posix())
-                if(out_path.exists() and out_path.is_symlink):
-                    if(out_path.link_to(soft_link_path)):
-                #if(exist_and_is_link(out_path)):
-
+                out_path.unlink(missing_ok=True)
+                out_path.symlink_to(soft_link_path.as_posix())
             else:
                 # If soft link path is not defined but a file already exist with this name in the
                 # correct defined output folder, check if it is a soft link, otherwise display a warning
                 out_search = list(out_dir.glob(out_name))
                 if(out_search):
                     out_path = out_search.pop()
-                    print(out_path)
-                    print("Warning, no soft link path defined, ")
+                    if(out_path.is_symlink()):
+                        print("Warning, no soft link path defined. But the file " + out_path.as_posix() + " already exist and is soft linked to " + out_path.readlink())
+                    else:
+                        print("Warning, no soft link path defined. The file will be placed in the " + out_dir.as_posix() + " directory")
                 else:
-                    print("Warning, no soft link path defined. The file will be placed in the " + out_dir + " directory")
-            
+                    out_path.touch()
+                    print("Warning, no soft link path defined. The file will be placed in the " + out_dir.as_posix() + " directory")
+            if(tryParsingKey("input_file_extension", data)):
+                file_extensions = "*" + data["input_file_extension"].strip()
+                print("Extensions = " + file_extensions)
+            else:
+                print("Warning getting using all files from " + dir.as_posix())
     else:
-        print("no")
+        print("Warning, no output file name defined, " + out_name + " will be used")
+        print("Warning, no output file name defined, " + out_dir.as_posix() + " will be used")
+        # If soft link path is not defined but a file already exist with this name in the
+        # correct defined output folder, check if it is a soft link, otherwise display a warning
+        out_search = list(out_dir.glob(out_name))
+        if(out_search):
+            out_path = out_search.pop()
+            if(out_path.is_symlink()):
+                print("Warning, no soft link path defined. But the file " + out_path.as_posix() + " already exist and is soft linket to " + out_path.readlink())
+            else:
+                print("Warning, no soft link path defined. The file will be placed in the " + out_dir.as_posix() + " directory")
+        else:
+            out_path.touch()
+            print("Warning, no soft link path defined. The file will be placed in the " + out_dir.as_posix() + " directory")
+        print("Warning getting using all files from " + dir.as_posix())
 
+    snippetFiles = list(dir.rglob(file_extensions))
 
+    with out_path.open("a+") as output:
+        output.truncate(0)
+        for file in snippetFiles:
+            with file.open() as f:
+                output.write(f.read() + "\n\n")
 
 
