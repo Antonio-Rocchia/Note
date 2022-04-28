@@ -311,7 +311,7 @@ All'inizio di un file comandi si aggiunge una direttiva da interprete per scegli
 #!<shell da usare>
 \end{lstlisting}
 
-La direttiva per la shell bash è #!/bin/bash
+La direttiva per la shell bash è \#!/bin/bash
 
 \subsection{Assegnamento di variabili}
 Per assegnare una variabile un nome per la variabile seguito da un '=' e poi il valore della variablile, SENZA SPAZI.
@@ -323,5 +323,94 @@ name=Antonio
 echo $name
 \end{lstlisting}
 
+\subsection{Passaggio di argomenti tramite variabili}
+Si possono passare argomenti posizionali ad un file comando.
+\begin{lstlisting}
+    ./nomefilecomandi arg1 arg2 ... argN
+\end{lstlisting}
+
+Gli argomenti sono variabili posizionali contenute nell'ambiente di shell.
+\$0 rappresenta sempre il nome del file. tutti gli altri comandi iniziano da \$1 -> arg1 e continuano con \$2 -> arg2, ..., \$n -> argN.
+
+Tramite il comando shift si può spostare verso destra l'iteratore delle variabili posizionali. \$0, il nome del programma resta \$0. \$1 diventa arg2, \$2 diventa arg3. mentre viene perso arg1.
+
+Il comando set può impostare delle variabili posizionali per l'istanza corrente della shell.
+\begin{lstlisting}
+    set exp1 exp2 ...
+
+    set Antonio Rocchia
+    echo $1 $2
+\end{lstlisting}
+
+\begin{lstlisting}
+    Antonio Rocchia
+\end{lstlisting}
+
+\subsection{Variabili notevoli nella shell}
+\begin{itemize}
+\item \$* insieme su tutte le variabili posizionali
+\item \$\# numero di argomenti passati nella riga di comando (\$0 escluso)
+\item \$\$ id numerico del processo in esecuzione (getpid() in C)
+\item \$? valore (int) restituito dall'ultimo comando eseguito.
+\end{itemize}
+
+\subsection{Valore di stato}
+Ogni comando restituisce un valore di stato che indica l'esito del comando.
+
+\subsection{Input e output}
+Per poter risolvere problemi tramite file comandi avremo bisogno di effettuare I/O da e verso file e da standard input e verso standard output.
+
+\begin{itemize}
+\item Il comando read legge da standard input. read var1 var2
+\item Il comando echo scrive su standard output. echo var1
+\end{itemize}
+
+\subsection{Valutazione delle espressioni (test)}
+Per valutare un espressione esistono vari strumenti. Quello più conosciuto è il comando test.
+\begin{lstlisting}
+    test [expression]
+\end{lstlisting}
+
+Restituisce uno stato uguale o diverso da 0, la convenzione è opposta a quella di C:
+\begin{itemize}
+\item zero -> true
+\item non-zero -> false
+\end{itemize}
+Il motivo di questa disomogeneità con C è per rimanere consistente con il resto dei comandi che possono essere usati in bash
+
+\begin{itemize}
+\item test -f <nomefile>, esistenza di file
+\item test -f <nomefile>, esistenza di directory
+\item test -f <nomefile>, diritto di lettura sul file (-w e -x)
+\item test -z <stringa>, vero se stringa nulla
+\item test <stringa> vero se stringa non nulla
+\item test <stringa1> = <stringa2> uguaglianza stringhe
+\item test <stringa1> != <stringa2> disuguaglianza stringhe
+\item test <val1> -gt <val2> (val1>val2)
+\item \item test <val1> -lt <val2> (val1<val2)
+\item \item test <val1> -ge <val2> (val1>=val2)
+\item \item test <val1> -le <val2> (val1<=val2)
+\end{itemize}
+
+Posso omettere il nome del comando test usando le parentesi quadre singole
+\begin{lstlisting}
+    test -d mydir
+    [ -d mydir ]
+\end{lstlisting}
+Sono equivalenti. Gli spazi sono significativi, [-d mydir] genera un errore (command not found).
+
+\subsubsection{Alternative a test}
+Si possono usare le due parentesi quadre [[ ... ]]. Impone che la condizione venga valutata dalla shell senza generare un processo figlio per testare la condizione (vantaggio prestazionale).
+
+La sintassi viene estesa per usare gli operatori logici (\&\&, ||, \ldots)
+
+All'interno delle doppie parentesi quadre i meta caratteri non vengono espansi. Quindi questi due casi sono differeni:
+\begin{lstlisting}
+    [[ $a = res* ]]
+    [ res* = result ]
+\end{lstlisting}
+
+\subsection{Strutture di controllo}
+Si possono usare sia if, elif ed else che case <var>, facendo un pattern matching (come uno switch)
 
 \end{document}
