@@ -19,6 +19,21 @@ The ```.scripts``` folder is organized per functionality in a folder structure:
 - ```.scripts/manage```: modify files created with other scripts with ease
 - ```.scripts/setup```: setup the entire workflow 
 
+### Setup
+In setup the ```install_latex.sh``` script will install all the packages you need to compile the .tex notes. 
+
+To use it run 
+```bash
+chmod +x .script/setup/install_latex.sh
+.script/setup/install_latex.sh
+```
+Input your password to install the packages.
+
+The script uses apt so it works for debian based distribution. You can check which packages the script installs and find them for your package manager using 
+```bash
+nano .script/setup/install_latex.sh
+```
+
 ### Snippet
 The ```.script/manage/snippet/BuildSnips.py``` script is used to update the snippet configurations for all application.
 
