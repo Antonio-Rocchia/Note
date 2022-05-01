@@ -31,11 +31,12 @@ extensions), and appends it into the output file
 This process is repeated for every folder in "$NOTE/.scripts/manage/snippet"
 """
 
+# TODO create file if it does not exist before symlinking to it
+
 from pathlib import Path
 
 import sys
 
-from sympy import true
 sys.path.append(Path(__file__).parents[2].as_posix())
 from config import SETTING_PATH
 
