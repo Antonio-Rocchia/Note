@@ -1,4 +1,4 @@
-snippet #enum "Enumerate environment" bA
+snippet -enum "Enumerate environment" bA
 \begin{enumerate}
 $0
 \end{enumerate}

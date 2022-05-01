@@ -1,0 +1,5 @@
+snippet -beg "Begin a generic environment" A
+\begin{$1}
+$0
+\end{$1}
+endsnippet

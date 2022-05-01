@@ -1,0 +1,3 @@
+snippet _code_inline "Inline code formatting" A
+\mintinline{$1}{$2}$0
+endsnippet

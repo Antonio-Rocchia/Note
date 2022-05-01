@@ -1,0 +1,9 @@
+snippet _code_import "Import and highlight code from a file" A
+\begin{listing}[!ht]
+
+\inputminted{$1}{$0}
+
+\caption{$2}
+\label{listing:$2}
+\end{listing}
+endsnippet

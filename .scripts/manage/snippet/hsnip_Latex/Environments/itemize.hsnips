@@ -1,4 +1,4 @@
-snippet #item "Itemize environment" bA
+snippet -item "Itemize environment" bA
 \begin{itemize}
 $0
 \end{itemize}

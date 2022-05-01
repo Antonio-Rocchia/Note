@@ -40,6 +40,14 @@ footskip=2cm,               % Distance from the bottom of the foot the end of bo
 
 \usepackage{parskip}
 
+\usepackage[outputdir=$3_out]{minted}    % Code highlighting
+\setminted{
+  breakanywhere=true,    % Break lines anywhere, not just at spaces
+  breaklines=true,       % Automatically break long lines 
+  frame=lines,
+  mathescape,            % Enable LATEX math mode inside comments.
+  }
+
 \usepackage{hyperref}
 \makeatletter
 \hypersetup{
@@ -55,10 +63,13 @@ pdfauthor={\@author}
 \urlstyle{same}
 
 \begin{document}
-\microtypesetup{protrusion=false} % disables protrusion locally in the document
+\microtypesetup{protrusion=false}                           % disables protrusion locally in the document
 \maketitle          
 \tableofcontents % prints Table of Contents
-\microtypesetup{protrusion=true} % enables protrusion
+\microtypesetup{protrusion=true}                            % enables protrusion
+
+\renewcommand\listoflistingscaption{Indice codice sorgente} 
+\listoflistings                                             % creates a list of source code wrapped in listing environment
 
 $0
 

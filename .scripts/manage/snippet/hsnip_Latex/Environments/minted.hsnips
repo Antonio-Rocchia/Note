@@ -1,0 +1,11 @@
+snippet -code "Code highlighting environment" A
+\begin{listing}[!ht]
+
+\begin{minted}{$1}
+$0
+\end{minted}
+
+\caption{$2}
+\label{listing:$2}
+\end{listing}
+endsnippet
